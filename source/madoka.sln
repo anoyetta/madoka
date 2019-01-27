@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.329
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "madoka", "madoka\madoka.csproj", "{212D45A0-FF1A-4EBE-BE16-A78DE2FED276}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{212D45A0-FF1A-4EBE-BE16-A78DE2FED276}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{212D45A0-FF1A-4EBE-BE16-A78DE2FED276}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{212D45A0-FF1A-4EBE-BE16-A78DE2FED276}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{212D45A0-FF1A-4EBE-BE16-A78DE2FED276}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {3BC35F97-6FFC-4F5A-A57F-CA9AFA7C6B4C}
+	EndGlobalSection
+EndGlobal
