@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 
@@ -6,24 +7,6 @@ namespace madoka
 {
     public static class NativeMethods
     {
-        public enum PROCESS_DPI_AWARENESS
-        {
-            /// <summary>
-            /// DPIスケーリング非対応
-            /// </summary>
-            PROCESS_DPI_UNAWARE = 0,
-
-            /// <summary>
-            /// DPIスケーリング対応だが異なるDPIのモニタには対応していない
-            /// </summary>
-            PROCESS_SYSTEM_DPI_AWARE = 1,
-
-            /// <summary>
-            /// DPIスケーリング対応
-            /// </summary>
-            PROCESS_PER_MONITOR_DPI_AWARE = 2
-        }
-
         public delegate bool EnumWindowsDelegate(IntPtr hWnd, IntPtr lparam);
 
         [DllImport("user32.dll")]
@@ -93,11 +76,32 @@ namespace madoka
         [DllImport("user32.dll")]
         public static extern bool ShowWindowAsync(IntPtr hWnd, int nCmdShow);
 
-        [DllImport("SHCore.dll", SetLastError = true)]
-        public static extern bool SetProcessDpiAwareness(PROCESS_DPI_AWARENESS awareness);
+        private const int PROCESS_QUERY_INFORMATION = 0x0400;
+        private const int PROCESS_VM_READ = 0x0010;
 
-        [DllImport("SHCore.dll", SetLastError = true)]
-        public static extern void GetProcessDpiAwareness(IntPtr hprocess, out PROCESS_DPI_AWARENESS awareness);
+        [DllImport("Kernel32.dll", SetLastError = true)]
+        private static extern IntPtr OpenProcess(uint dwDesiredAccess, [MarshalAs(UnmanagedType.Bool)] bool bInheritHandle, uint dwProcessId);
+
+        [DllImport("Kernel32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static extern bool CloseHandle(IntPtr handle);
+
+        private const int S_OK = 0;
+
+        public enum PROCESS_DPI_AWARENESS
+        {
+            /// <summary>DPIスケーリング非対応</summary>
+            PROCESS_DPI_UNAWARE = 0,
+
+            /// <summary>DPIスケーリング対応だが異なるDPIのモニタには対応していない</summary>
+            PROCESS_SYSTEM_DPI_AWARE = 1,
+
+            /// <summary>DPIスケーリング対応</summary>
+            PROCESS_PER_MONITOR_DPI_AWARE = 2
+        }
+
+        [DllImport("Shcore.dll")]
+        private static extern int GetProcessDpiAwareness(IntPtr hprocess, out PROCESS_DPI_AWARENESS value);
 
         public static IntPtr FindWindow(
             string processName)
@@ -133,6 +137,30 @@ namespace madoka
             EnumWindows(callback, IntPtr.Zero);
 
             return handle;
+        }
+
+        public static PROCESS_DPI_AWARENESS GetDPIState(
+            uint processId)
+        {
+            var handle = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, false, processId);
+
+            if (handle != IntPtr.Zero)
+            {
+                PROCESS_DPI_AWARENESS value;
+                int result = GetProcessDpiAwareness(handle, out value);
+                if (result == S_OK)
+                {
+                    System.Diagnostics.Debug.Print(value.ToString());
+                }
+                CloseHandle(handle);
+                if (result != S_OK)
+                {
+                    throw new Win32Exception(result);
+                }
+                return value;
+            }
+
+            throw new Win32Exception(Marshal.GetLastWin32Error());
         }
     }
 }

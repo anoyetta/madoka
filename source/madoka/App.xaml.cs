@@ -96,7 +96,10 @@ namespace madoka
                         target.IsRunning = true;
                     });
 
-                    if (target.IsLockLocation)
+                    await target.GetProcessDPIAwareness();
+
+                    if (target.IsLockLocation ||
+                        !target.IsLocationApplied)
                     {
                         await target.SetWindowRect();
                     }

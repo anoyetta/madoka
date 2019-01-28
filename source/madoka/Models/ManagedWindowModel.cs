@@ -157,10 +157,20 @@ namespace madoka.Models
 
         private DPIAwares dpiAware = DPIAwares.Disable;
 
+        [JsonProperty(PropertyName = "dpi_aware")]
         public DPIAwares DPIAware
         {
             get => this.dpiAware;
             set => this.SetProperty(ref this.dpiAware, value);
+        }
+
+        private NativeMethods.PROCESS_DPI_AWARENESS processDPIAwareness = NativeMethods.PROCESS_DPI_AWARENESS.PROCESS_DPI_UNAWARE;
+
+        [JsonIgnore]
+        public NativeMethods.PROCESS_DPI_AWARENESS ProcessDPIAwareness
+        {
+            get => this.processDPIAwareness;
+            set => this.SetProperty(ref this.processDPIAwareness, value);
         }
 
         private int x;
@@ -211,6 +221,10 @@ namespace madoka.Models
         [JsonIgnore]
         public ManagedWindowGroupModel Parrent { get; set; }
 
+        private int managedProcessID;
+
+        public bool IsLocationApplied { get; private set; }
+
         #region Commands
 
         private ICommand getWindowInfoCommand;
@@ -260,6 +274,13 @@ namespace madoka.Models
                 };
 
                 var p = Process.Start(pi);
+
+                if (this.managedProcessID != p.Id)
+                {
+                    this.managedProcessID = p.Id;
+                    this.IsLocationApplied = false;
+                }
+
                 p.WaitForInputIdle();
 
                 await Application.Current.Dispatcher.InvokeAsync(() =>
@@ -272,6 +293,30 @@ namespace madoka.Models
             });
         }
 
+        private int lastDPIAwarenessDetectedProcessID = 0;
+
+        public async Task GetProcessDPIAwareness()
+        {
+            await Task.Run(async () =>
+            {
+                if (this.managedProcessID == 0)
+                {
+                    return;
+                }
+
+                if (this.lastDPIAwarenessDetectedProcessID != this.managedProcessID)
+                {
+                    this.lastDPIAwarenessDetectedProcessID = this.managedProcessID;
+                    var state = NativeMethods.GetDPIState((uint)this.managedProcessID);
+
+                    await Application.Current.Dispatcher.InvokeAsync(() =>
+                    {
+                        this.ProcessDPIAwareness = state;
+                    });
+                }
+            });
+        }
+
         public async Task GetWindowInfo()
         {
             if (string.IsNullOrEmpty(this.exe) ||
@@ -280,7 +325,7 @@ namespace madoka.Models
                 return;
             }
 
-            await Task.Run(async () =>
+            var t1 = Task.Run(async () =>
             {
                 var name = $@"Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers\{this.exe}";
                 var reg = Registry.CurrentUser.OpenSubKey(name, true);
@@ -323,7 +368,7 @@ namespace madoka.Models
                 });
             });
 
-            await Task.Run(async () =>
+            var t2 = Task.Run(async () =>
             {
                 var handle = NativeMethods.FindWindow(Path.GetFileNameWithoutExtension(this.exe));
                 if (handle == IntPtr.Zero)
@@ -346,6 +391,8 @@ namespace madoka.Models
                     this.H = rect.Height;
                 });
             });
+
+            await Task.WhenAll(t1, t2);
         }
 
         public async Task SetRegistry()
@@ -460,6 +507,8 @@ namespace madoka.Models
                 }
 
                 NativeMethods.ShowWindowAsync(handle, cmd);
+
+                this.IsLocationApplied = true;
             });
         }
 
