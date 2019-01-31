@@ -8,6 +8,7 @@
   xmlns:materialConverters="clr-namespace:MaterialDesignThemes.Wpf.Converters;assembly=MaterialDesignThemes.Wpf"
   xmlns:metro="http://metro.mahapps.com/winfx/xaml/controls"
   xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+  xmlns:tb="http://www.hardcodet.net/taskbar"
   xmlns:vm="clr-namespace:madoka.ViewModels"
   xmlns:local="clr-namespace:madoka"
   mc:Ignorable="d"
@@ -44,7 +45,18 @@
     </Style>
   </d:DesignerProperties.DesignStyle>
 
+  <metro:MetroWindow.Resources>
+    <ToolTip x:Key="NotifyIconToolTip" Content="madoka" />
+  </metro:MetroWindow.Resources>
+
   <Grid>
+
+    <tb:TaskbarIcon
+      x:Name="NotifyIcon"
+      IconSource="madoka.ico"
+      Visibility="Visible"
+      ToolTip="{DynamicResource NotifyIconToolTip}"
+      MenuActivation="LeftOrRightClick" />
 
     <DockPanel VerticalAlignment="Bottom" Margin="8">
       <!-- ボタンパネルL -->
