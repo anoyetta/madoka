@@ -1,3 +1,4 @@
+using madoka.Views;
 using Prism.Commands;
 using Prism.Mvvm;
 
@@ -8,6 +9,25 @@ namespace madoka.ViewModels
         public Config Config => Config.Instance;
 
         #region Commands
+
+        private DelegateCommand addCommand;
+
+        public DelegateCommand AddCommand =>
+            this.addCommand ?? (this.addCommand = new DelegateCommand(this.ExecuteAddCommand));
+
+        private void ExecuteAddCommand()
+        {
+            var view = new AppSettingsView()
+            {
+                Owner = MainWindow.Instance
+            };
+
+            view.Show();
+        }
+
+        #endregion Commands
+
+        #region ContextMenu Commands
 
         private DelegateCommand showCommand;
 
@@ -29,6 +49,6 @@ namespace madoka.ViewModels
             MainWindow.Instance.ToEnd();
         }
 
-        #endregion Commands
+        #endregion ContextMenu Commands
     }
 }

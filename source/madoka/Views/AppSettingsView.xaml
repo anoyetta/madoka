@@ -11,7 +11,73 @@
   xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
   xmlns:vm="clr-namespace:madoka.ViewModels"
   mc:Ignorable="d"
-  Title="AppSettingsView" Height="450" Width="800">
-  <Grid>
+  TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+  TextElement.FontWeight="Regular"
+  TextOptions.TextFormattingMode="Ideal"
+  TextOptions.TextRenderingMode="Auto"
+  Background="{DynamicResource MaterialDesignPaper}"
+  FontFamily="{DynamicResource MaterialDesignFont}"
+  GlowBrush="{DynamicResource AccentColorBrush}"
+  Icon="/madoka;component/madoka.ico"
+  ResizeMode="NoResize"
+  WindowStartupLocation="CenterOwner"
+  TitleCharacterCasing="Normal"
+  Title="madoka - App"
+  SizeToContent="Height"
+  Width="640">
+
+  <metro:MetroWindow.Resources>
+    <Thickness x:Key="ContentMargin">0 15 0 0</Thickness>
+  </metro:MetroWindow.Resources>
+
+  <Grid Margin="0">
+    <StackPanel>
+      <GroupBox Header="基本">
+        <StackPanel>
+          <metro:MetroHeader Header="アプリケーションのパス">
+            <TextBox />
+          </metro:MetroHeader>
+
+          <metro:MetroHeader Header="表示名 (Optional)" Margin="{DynamicResource ContentMargin}" Foreground="{DynamicResource GrayBrush3}">
+            <TextBox />
+          </metro:MetroHeader>
+
+          <metro:MetroHeader Header="作業ディレクトリ (Optional)" Margin="{DynamicResource ContentMargin}" Foreground="{DynamicResource GrayBrush3}">
+            <TextBox />
+          </metro:MetroHeader>
+
+          <metro:MetroHeader Header="引数 (Optional)" Margin="{DynamicResource ContentMargin}" Foreground="{DynamicResource GrayBrush3}">
+            <TextBox />
+          </metro:MetroHeader>
+        </StackPanel>
+      </GroupBox>
+
+      <GroupBox Header="レイアウト">
+        <StackPanel>
+          <metro:MetroHeader Header="位置">
+            <StackPanel Orientation="Horizontal">
+              <Label Content="X" Width="30" />
+              <metro:NumericUpDown Width="110" StringFormat="N0" HorizontalContentAlignment="Right" />
+              <Label Content="Y" Width="30" Margin="20 0 0 0" />
+              <metro:NumericUpDown Width="110" StringFormat="N0" HorizontalContentAlignment="Right" />
+            </StackPanel>
+          </metro:MetroHeader>
+
+          <metro:MetroHeader Header="サイズ" Margin="{DynamicResource ContentMargin}">
+            <StackPanel Orientation="Horizontal">
+              <Label Content="W" Width="30" />
+              <metro:NumericUpDown Width="110" StringFormat="N0" HorizontalContentAlignment="Right" />
+              <Label Content="H" Width="30" Margin="20 0 0 0" />
+              <metro:NumericUpDown Width="110" StringFormat="N0" HorizontalContentAlignment="Right" />
+            </StackPanel>
+          </metro:MetroHeader>
+
+          <metro:ToggleSwitch
+            Header="レイアウトを固定する"
+            Focusable="False"
+            Margin="{DynamicResource ContentMargin}" />
+        </StackPanel>
+      </GroupBox>
+    </StackPanel>
   </Grid>
 </metro:MetroWindow>
