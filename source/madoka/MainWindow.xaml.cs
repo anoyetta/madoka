@@ -20,6 +20,11 @@ namespace madoka
 
             this.StateChanged += this.MainWindow_StateChanged;
             this.Closing += this.MainWindow_Closing;
+
+            if (Config.Instance.IsMinimizeStartup)
+            {
+                this.ToHide();
+            }
         }
 
         private void MainWindow_StateChanged(object sender, EventArgs e)
@@ -27,10 +32,12 @@ namespace madoka
             if (this.WindowState == WindowState.Minimized)
             {
                 this.Visibility = Visibility.Collapsed;
+                this.NotifyIcon.Visibility = Visibility.Visible;
             }
             else
             {
                 this.Visibility = Visibility.Visible;
+                this.NotifyIcon.Visibility = Visibility.Collapsed;
             }
         }
 
@@ -40,7 +47,7 @@ namespace madoka
         {
             if (!this.toEnd)
             {
-                this.WindowState = WindowState.Minimized;
+                this.ToHide();
                 e.Cancel = true;
                 return;
             }
@@ -49,14 +56,28 @@ namespace madoka
             this.NotifyIcon.Dispose();
         }
 
+        public void ToggleVisibility()
+        {
+            if (this.WindowState == WindowState.Minimized)
+            {
+                this.ToShow();
+            }
+            else
+            {
+                this.ToHide();
+            }
+        }
+
         public void ToShow()
         {
+            this.Visibility = Visibility.Visible;
             this.WindowState = WindowState.Normal;
         }
 
         public void ToHide()
         {
             this.WindowState = WindowState.Minimized;
+            this.Visibility = Visibility.Collapsed;
         }
 
         public void ToEnd()

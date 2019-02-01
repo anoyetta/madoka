@@ -20,7 +20,7 @@
   FontFamily="{DynamicResource MaterialDesignFont}"
   GlowBrush="{DynamicResource AccentColorBrush}"
   TitleCharacterCasing="Normal"
-  Title="madoka"
+  Title="{Binding Config.AppName, Mode=OneWay}"
   TitlebarHeight="41"
   Icon="madoka.ico"
   d:DataContext="{d:DesignInstance {x:Type vm:MainWindowViewModel}, IsDesignTimeCreatable=True}"
@@ -47,6 +47,21 @@
 
   <metro:MetroWindow.Resources>
     <ToolTip x:Key="NotifyIconToolTip" Content="madoka" />
+
+    <ContextMenu x:Key="NotifyIconMenu" MinWidth="200">
+      <ContextMenu.Resources>
+        <Style TargetType="MenuItem" BasedOn="{StaticResource MetroMenuItem}">
+          <Setter Property="Height" Value="30" />
+        </Style>
+      </ContextMenu.Resources>
+
+      <MenuItem Header="{Binding Config.AppName, Mode=OneWay}" Command="{Binding ShowCommand, Mode=OneWay}" FontWeight="Bold" FontSize="18" Height="36" IsHitTestVisible="False" />
+      <MenuItem Header="表示" Command="{Binding ShowCommand, Mode=OneWay}" />
+      <Separator />
+      <MenuItem Header="設定" Command="{Binding ShowConfigCommand, Mode=OneWay}" />
+      <Separator />
+      <MenuItem Header="終了" Command="{Binding EndCommand, Mode=OneWay}" />
+    </ContextMenu>
   </metro:MetroWindow.Resources>
 
   <Grid>
@@ -54,9 +69,9 @@
     <tb:TaskbarIcon
       x:Name="NotifyIcon"
       IconSource="madoka.ico"
-      Visibility="Visible"
-      ToolTip="{DynamicResource NotifyIconToolTip}"
-      MenuActivation="LeftOrRightClick" />
+      Visibility="Collapsed"
+      ContextMenu="{DynamicResource NotifyIconMenu}"
+      ToolTip="{DynamicResource NotifyIconToolTip}" />
 
     <DockPanel VerticalAlignment="Bottom" Margin="8">
       <!-- ボタンパネルL -->

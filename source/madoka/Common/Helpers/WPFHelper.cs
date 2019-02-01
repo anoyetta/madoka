@@ -1,4 +1,5 @@
 using System.Windows;
+using System.Windows.Threading;
 using MahApps.Metro.Controls;
 
 namespace madoka.Common
@@ -6,6 +7,8 @@ namespace madoka.Common
     public static class WPFHelper
     {
         public static MetroWindow MainWindow => Application.Current?.MainWindow as MetroWindow;
+
+        public static Dispatcher Dispatcher => Application.Current?.Dispatcher;
 
 #if DEBUG
         private static bool isDebugMode = false;

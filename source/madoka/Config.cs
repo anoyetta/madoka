@@ -1,6 +1,8 @@
+using System;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Reflection;
+using System.Windows;
 using madoka.Common;
 using madoka.Models;
 using Newtonsoft.Json;
@@ -29,13 +31,34 @@ namespace madoka
 
         #region Data
 
+        [JsonIgnore]
+        public string AppName => Assembly.GetExecutingAssembly().GetTitle();
+
+        [JsonIgnore]
+        public string AppNameWithVersion => $"{this.AppName} {this.AppVersionString}";
+
+        [JsonIgnore]
+        public Version AppVersion => Assembly.GetExecutingAssembly().GetVersion();
+
+        [JsonIgnore]
+        public string AppVersionString => $"v{this.AppVersion.ToString()}";
+
         private double mainWindowX;
 
         [JsonProperty(PropertyName = "mainwindow_x")]
         public double MainWindowX
         {
             get => this.mainWindowX;
-            set => this.SetProperty(ref this.mainWindowX, value);
+            set
+            {
+                if (MainWindow.Instance != null &&
+                    MainWindow.Instance.WindowState != WindowState.Normal)
+                {
+                    return;
+                }
+
+                this.SetProperty(ref this.mainWindowX, value);
+            }
         }
 
         private double mainWindowY;
@@ -44,7 +67,16 @@ namespace madoka
         public double MainWindowY
         {
             get => this.mainWindowY;
-            set => this.SetProperty(ref this.mainWindowY, value);
+            set
+            {
+                if (MainWindow.Instance != null &&
+                    MainWindow.Instance.WindowState != WindowState.Normal)
+                {
+                    return;
+                }
+
+                this.SetProperty(ref this.mainWindowY, value);
+            }
         }
 
         private double mainWindowW;
@@ -53,7 +85,16 @@ namespace madoka
         public double MainWindowW
         {
             get => this.mainWindowW;
-            set => this.SetProperty(ref this.mainWindowW, value);
+            set
+            {
+                if (MainWindow.Instance != null &&
+                    MainWindow.Instance.WindowState != WindowState.Normal)
+                {
+                    return;
+                }
+
+                this.SetProperty(ref this.mainWindowW, value);
+            }
         }
 
         private double mainWindowH;
@@ -62,7 +103,16 @@ namespace madoka
         public double MainWindowH
         {
             get => this.mainWindowH;
-            set => this.SetProperty(ref this.mainWindowH, value);
+            set
+            {
+                if (MainWindow.Instance != null &&
+                    MainWindow.Instance.WindowState != WindowState.Normal)
+                {
+                    return;
+                }
+
+                this.SetProperty(ref this.mainWindowH, value);
+            }
         }
 
         private bool isStartupWithWindows;
