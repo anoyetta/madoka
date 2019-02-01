@@ -4,21 +4,20 @@
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-  xmlns:material="http://materialdesigninxaml.net/winfx/xaml/themes"
-  xmlns:materialConverters="clr-namespace:MaterialDesignThemes.Wpf.Converters;assembly=MaterialDesignThemes.Wpf"
   xmlns:metro="http://metro.mahapps.com/winfx/xaml/controls"
   xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
   xmlns:tb="http://www.hardcodet.net/taskbar"
   xmlns:vm="clr-namespace:madoka.ViewModels"
   xmlns:local="clr-namespace:madoka"
   mc:Ignorable="d"
-  TextElement.Foreground="{DynamicResource MaterialDesignBody}"
-  TextElement.FontWeight="Regular"
-  TextOptions.TextFormattingMode="Ideal"
-  TextOptions.TextRenderingMode="Auto"
-  Background="{DynamicResource MaterialDesignPaper}"
-  FontFamily="{DynamicResource MaterialDesignFont}"
   GlowBrush="{DynamicResource AccentColorBrush}"
+  TextOptions.TextFormattingMode="Ideal"
+  TextOptions.TextRenderingMode="ClearType"
+  TextOptions.TextHintingMode="Auto"
+  RenderOptions.EdgeMode="Unspecified"
+  RenderOptions.BitmapScalingMode="Fant"
+  RenderOptions.ClearTypeHint="Enabled"
+  TextElement.FontWeight="Regular"
   TitleCharacterCasing="Normal"
   Title="{Binding Config.AppName, Mode=OneWay}"
   TitlebarHeight="41"
@@ -32,6 +31,10 @@
   <metro:MetroWindow.DataContext>
     <vm:MainWindowViewModel />
   </metro:MetroWindow.DataContext>
+
+  <metro:MetroWindow.LayoutTransform>
+    <ScaleTransform ScaleX="{Binding Config.Scale, Mode=OneWay}" ScaleY="{Binding Config.Scale, Mode=OneWay}" />
+  </metro:MetroWindow.LayoutTransform>
 
   <metro:MetroWindow.IconTemplate>
     <DataTemplate>
@@ -80,7 +83,7 @@
           Width="45"
           Height="45"
           Style="{DynamicResource IconButtonStyle}"
-          Command="{Binding ConfigCommand, Mode=OneWay}">
+          Command="{Binding ShowConfigCommand, Mode=OneWay}">
           <iconPacks:PackIconMaterial Kind="Settings"  Foreground="{DynamicResource IdealForegroundColorBrush}">
             <iconPacks:PackIconMaterial.LayoutTransform>
               <ScaleTransform ScaleX="1.3" ScaleY="1.3" />
@@ -104,15 +107,5 @@
         </Button>
       </StackPanel>
     </DockPanel>
-
-    <material:Snackbar
-      x:Name="Snackbar"
-      HorizontalAlignment="Center"
-      VerticalAlignment="Bottom"
-      HorizontalContentAlignment="Center"
-      VerticalContentAlignment="Center"
-      Opacity="0.8"
-      Margin="0 0 0 20"
-      MessageQueue="{material:MessageQueue}" />
   </Grid>
 </metro:MetroWindow>

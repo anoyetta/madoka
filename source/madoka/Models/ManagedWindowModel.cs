@@ -90,7 +90,7 @@ namespace madoka.Models
         }
 
         [JsonIgnore]
-        public ReactiveProperty<string> DisplayName;
+        public ReactiveProperty<string> DisplayName = new ReactiveProperty<string>();
 
         private string exe;
 

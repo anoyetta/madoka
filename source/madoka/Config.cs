@@ -43,6 +43,15 @@ namespace madoka
         [JsonIgnore]
         public string AppVersionString => $"v{this.AppVersion.ToString()}";
 
+        private double scale = 1.0;
+
+        [JsonProperty(PropertyName = "scale")]
+        public double Scale
+        {
+            get => this.scale;
+            set => this.SetProperty(ref this.scale, value);
+        }
+
         private double mainWindowX;
 
         [JsonProperty(PropertyName = "mainwindow_x")]

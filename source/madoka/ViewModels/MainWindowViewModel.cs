@@ -1,3 +1,4 @@
+using madoka.Models;
 using madoka.Views;
 using Prism.Commands;
 using Prism.Mvvm;
@@ -19,7 +20,23 @@ namespace madoka.ViewModels
         {
             var view = new AppSettingsView()
             {
-                Owner = MainWindow.Instance
+                Owner = MainWindow.Instance,
+                DataContext = new ManagedWindowModel(),
+            };
+
+            view.Show();
+        }
+
+        private DelegateCommand showConfigCommand;
+
+        public DelegateCommand ShowConfigCommand =>
+            this.showConfigCommand ?? (this.showConfigCommand = new DelegateCommand(this.ExecuteShowConfigCommand));
+
+        private void ExecuteShowConfigCommand()
+        {
+            var view = new ConfigView()
+            {
+                Owner = MainWindow.Instance,
             };
 
             view.Show();

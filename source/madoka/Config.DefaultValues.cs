@@ -6,6 +6,7 @@ namespace madoka
     {
         public override Dictionary<string, object> DefaultValues => new Dictionary<string, object>()
         {
+            { nameof(Scale), 1.0d },
             { nameof(MainWindowX), 200 },
             { nameof(MainWindowY), 100 },
             { nameof(MainWindowW), 1600 },

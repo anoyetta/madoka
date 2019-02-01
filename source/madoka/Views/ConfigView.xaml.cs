@@ -1,27 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
+using madoka.ViewModels;
+using MahApps.Metro.Controls;
 
 namespace madoka.Views
 {
     /// <summary>
     /// ConfigView.xaml の相互作用ロジック
     /// </summary>
-    public partial class ConfigView : Window
+    public partial class ConfigView : MetroWindow
     {
         public ConfigView()
         {
-            InitializeComponent();
+            this.InitializeComponent();
+
+            this.Closed += (_, __) =>
+            {
+                var config = (this.DataContext as ConfigViewModel)?.Config;
+                config.Save();
+            };
         }
     }
 }
