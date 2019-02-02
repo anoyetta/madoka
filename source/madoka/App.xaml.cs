@@ -1,10 +1,12 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Windows;
 using System.Windows.Threading;
+using madoka.Models;
 
 namespace madoka
 {
@@ -26,6 +28,7 @@ namespace madoka
         {
             // Configをロードする
             var c = Config.Instance;
+            c.SetStartup(c.IsStartupWithWindows);
 
             // 監視スレッドを生成する
             this.detectProcessThread = new Thread(new ThreadStart(this.DetectProcessLoop))
@@ -66,7 +69,13 @@ namespace madoka
 
         private async void DetectProcess()
         {
-            var targets = Config.Instance.ManagedWindowList
+            var list = default(IEnumerable<ManagedWindowModel>);
+            lock (Config.Instance.ManagedWindowList)
+            {
+                list = Config.Instance.ManagedWindowList.ToArray();
+            }
+
+            var targets = list
                 .Where(x => x.IsEnabled)
                 .ToArray();
 

@@ -36,10 +36,8 @@
         </Style.Triggers>
       </Style>
 
-      <!-- Default Styles -->
-      <!-- トグルボタンのスタイルをWin10スタイルにする -->
-      <Style TargetType="{x:Type metro:ToggleSwitch}" BasedOn="{StaticResource MahApps.Metro.Styles.ToggleSwitch.Win10}">
-        <Setter Property="Focusable" Value="False" />
+      <Style TargetType="CheckBox" BasedOn="{StaticResource MetroCheckBox}">
+        <Setter Property="VerticalContentAlignment" Value="Center" />
       </Style>
 
       <!-- Global Converters -->

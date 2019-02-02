@@ -1,3 +1,4 @@
+using System.Windows.Input;
 using madoka.ViewModels;
 using MahApps.Metro.Controls;
 
@@ -11,6 +12,14 @@ namespace madoka.Views
         public ConfigView()
         {
             this.InitializeComponent();
+
+            this.KeyUp += (_, e) =>
+            {
+                if (e.Key == Key.Escape)
+                {
+                    this.Close();
+                }
+            };
 
             this.Closed += (_, __) =>
             {

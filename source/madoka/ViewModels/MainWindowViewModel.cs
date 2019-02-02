@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Specialized;
 using madoka.Models;
 using madoka.Views;
 using Prism.Commands;
@@ -5,9 +7,28 @@ using Prism.Mvvm;
 
 namespace madoka.ViewModels
 {
-    public class MainWindowViewModel : BindableBase
+    public class MainWindowViewModel :
+        BindableBase,
+        IDisposable
     {
         public Config Config => Config.Instance;
+
+        public MainWindowViewModel()
+        {
+            this.Config.ManagedWindowList.CollectionChanged += this.ManagedWindowList_CollectionChanged;
+        }
+
+        public void Dispose()
+        {
+            this.Config.ManagedWindowList.CollectionChanged -= this.ManagedWindowList_CollectionChanged;
+        }
+
+        private void ManagedWindowList_CollectionChanged(
+            object sender,
+            NotifyCollectionChangedEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
 
         #region Commands
 
@@ -21,8 +42,9 @@ namespace madoka.ViewModels
             var view = new AppSettingsView()
             {
                 Owner = MainWindow.Instance,
-                DataContext = new ManagedWindowModel(),
             };
+
+            (view.DataContext as AppSettingsViewModel).Model = new ManagedWindowModel();
 
             view.Show();
         }

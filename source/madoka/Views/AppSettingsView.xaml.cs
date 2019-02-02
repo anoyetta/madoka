@@ -1,3 +1,5 @@
+using System.Windows.Input;
+using madoka.ViewModels;
 using MahApps.Metro.Controls;
 
 namespace madoka.Views
@@ -10,6 +12,25 @@ namespace madoka.Views
         public AppSettingsView()
         {
             this.InitializeComponent();
+
+            this.KeyUp += (_, e) =>
+            {
+                if (e.Key == Key.Escape)
+                {
+                    this.Close();
+                }
+            };
+
+            this.Closed += (_, __) => Config.Instance.Save();
+
+            this.Loaded += (_, __) =>
+            {
+                var vm = this.DataContext as AppSettingsViewModel;
+                if (vm != null)
+                {
+                    vm.CloseAction = this.Close;
+                }
+            };
         }
     }
 }

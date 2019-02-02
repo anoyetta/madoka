@@ -39,36 +39,39 @@
       <metro:MetroHeader Header="スケール">
         <Grid Margin="0 5 0 0">
           <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto" />
             <ColumnDefinition />
+            <ColumnDefinition Width="Auto" />
           </Grid.ColumnDefinitions>
 
-          <Label Content="{Binding Config.Scale, Mode=OneWay}" Width="40" ContentStringFormat="N1" />
-
           <Slider
-            Grid.Column="1"
+            Grid.Column="0"
             Value="{Binding Config.Scale, Mode=TwoWay}"
-            Minimum="0.5"
-            Maximum="8.0"
-            LargeChange="0.1"
-            SmallChange="0.1"
-            Ticks="0.0 1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0"
-            TickFrequency="1"
+            Minimum="0.00"
+            Maximum="8.00"
+            LargeChange="0.01"
+            SmallChange="0.01"
+            TickFrequency="0.5"
             TickPlacement="Both"
             metro:SliderHelper.ChangeValueBy="LargeChange"
             metro:SliderHelper.EnableMouseWheel="MouseHover"
             Style="{DynamicResource MahApps.Metro.Styles.Slider.Win10}" />
+
+          <TextBlock
+            Grid.Column="1"
+            TextAlignment="Right"
+            Text="{Binding Config.Scale, Mode=OneWay, StringFormat=N2}"
+            Width="50" />
         </Grid>
       </metro:MetroHeader>
 
-      <metro:ToggleSwitch
-        Header="Windows の開始時に起動する"
+      <CheckBox
+        Content="Windows のスタート時に起動する"
         IsChecked="{Binding Config.IsStartupWithWindows}"
         Margin="{DynamicResource ContentMargin}" />
 
-      <metro:ToggleSwitch
-        Header="最小化状態で起動する"
-        IsChecked="{Binding Config.IsStartupWithWindows}"
+      <CheckBox
+        Content="最小化状態で起動する"
+        IsChecked="{Binding Config.IsMinimizeStartup}"
         Margin="{DynamicResource ContentMargin}" />
     </StackPanel>
   </Grid>

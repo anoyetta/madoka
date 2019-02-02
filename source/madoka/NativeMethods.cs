@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 
@@ -24,7 +25,7 @@ namespace madoka
             public int Right;
             public int Bottom;
             public int Width => this.Right - this.Left;
-            public int Height => this.Top - this.Bottom;
+            public int Height => this.Bottom - this.Top;
         }
 
         [DllImport("User32.Dll", EntryPoint = "GetWindowRect")]
@@ -91,12 +92,15 @@ namespace madoka
         public enum PROCESS_DPI_AWARENESS
         {
             /// <summary>DPIスケーリング非対応</summary>
+            [Display(Name = "非対応")]
             PROCESS_DPI_UNAWARE = 0,
 
             /// <summary>DPIスケーリング対応だが異なるDPIのモニタには対応していない</summary>
+            [Display(Name = "システムDPIスケーリング対応")]
             PROCESS_SYSTEM_DPI_AWARE = 1,
 
             /// <summary>DPIスケーリング対応</summary>
+            [Display(Name = "システムDPIスケーリング対応＋マルチモニタ対応")]
             PROCESS_PER_MONITOR_DPI_AWARE = 2
         }
 
@@ -152,11 +156,13 @@ namespace madoka
                 {
                     System.Diagnostics.Debug.Print(value.ToString());
                 }
+
                 CloseHandle(handle);
                 if (result != S_OK)
                 {
                     throw new Win32Exception(result);
                 }
+
                 return value;
             }
 

@@ -73,8 +73,9 @@
       x:Name="NotifyIcon"
       IconSource="madoka.ico"
       Visibility="Collapsed"
+      DoubleClickCommand="{Binding ShowCommand, Mode=OneWay}"
       ContextMenu="{DynamicResource NotifyIconMenu}"
-      ToolTip="{DynamicResource NotifyIconToolTip}" />
+      ToolTipText="{Binding Config.AppNameWithVersion, Mode=OneWay}" />
 
     <DockPanel VerticalAlignment="Bottom" Margin="8">
       <!-- ボタンパネルL -->
@@ -89,6 +90,15 @@
               <ScaleTransform ScaleX="1.3" ScaleY="1.3" />
             </iconPacks:PackIconMaterial.LayoutTransform>
           </iconPacks:PackIconMaterial>
+        </Button>
+
+        <Button
+          Width="45"
+          Height="45"
+          Margin="10 0 0 0"
+          Style="{DynamicResource IconButtonStyle}"
+          Command="{Binding EndCommand, Mode=OneWay}">
+          <iconPacks:PackIconMaterial Kind="Close"  Foreground="{DynamicResource IdealForegroundColorBrush}" />
         </Button>
       </StackPanel>
 

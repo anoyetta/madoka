@@ -2,9 +2,11 @@ using System;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Reflection;
+using System.Threading.Tasks;
 using System.Windows;
 using madoka.Common;
 using madoka.Models;
+using Microsoft.Win32;
 using Newtonsoft.Json;
 
 namespace madoka
@@ -35,7 +37,7 @@ namespace madoka
         public string AppName => Assembly.GetExecutingAssembly().GetTitle();
 
         [JsonIgnore]
-        public string AppNameWithVersion => $"{this.AppName} {this.AppVersionString}";
+        public string AppNameWithVersion => $"{this.AppName} - {this.AppVersionString}";
 
         [JsonIgnore]
         public Version AppVersion => Assembly.GetExecutingAssembly().GetVersion();
@@ -49,7 +51,7 @@ namespace madoka
         public double Scale
         {
             get => this.scale;
-            set => this.SetProperty(ref this.scale, value);
+            set => this.SetProperty(ref this.scale, Math.Round(value, 2));
         }
 
         private double mainWindowX;
@@ -130,8 +132,37 @@ namespace madoka
         public bool IsStartupWithWindows
         {
             get => this.isStartupWithWindows;
-            set => this.SetProperty(ref this.isStartupWithWindows, value);
+            set
+            {
+                if (this.SetProperty(ref this.isStartupWithWindows, value))
+                {
+                    this.SetStartup(value);
+                }
+            }
         }
+
+        public async void SetStartup(
+            bool isStartup) =>
+            await Task.Run(() =>
+            {
+                using (var regkey = Registry.CurrentUser.OpenSubKey(
+                    @"Software\Microsoft\Windows\CurrentVersion\Run",
+                    true))
+                {
+                    if (isStartup)
+                    {
+                        regkey.SetValue(
+                            Assembly.GetExecutingAssembly().GetProduct(),
+                            $"\"{Assembly.GetExecutingAssembly().Location}\"");
+                    }
+                    else
+                    {
+                        regkey.DeleteValue(
+                            Assembly.GetExecutingAssembly().GetProduct(),
+                            false);
+                    }
+                }
+            });
 
         private bool isMinimizeStartup;
 

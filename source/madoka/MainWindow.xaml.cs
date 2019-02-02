@@ -1,6 +1,11 @@
 using System;
 using System.ComponentModel;
+using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Threading;
+using Hardcodet.Wpf.TaskbarNotification;
+using madoka.Common;
+using madoka.ViewModels;
 using MahApps.Metro.Controls;
 
 namespace madoka
@@ -21,9 +26,35 @@ namespace madoka
             this.StateChanged += this.MainWindow_StateChanged;
             this.Closing += this.MainWindow_Closing;
 
+            this.Closed += (_, __) =>
+            {
+                var vm = this.DataContext as MainWindowViewModel;
+                if (vm != null)
+                {
+                    vm.Dispose();
+                }
+            };
+
             if (Config.Instance.IsMinimizeStartup)
             {
-                this.ToHide();
+                this.ShowInTaskbar = false;
+
+                this.Loaded += async (_, __) =>
+                {
+                    this.ToHide();
+
+                    await Task.Delay(TimeSpan.FromSeconds(0.1));
+                    this.ShowInTaskbar = true;
+
+                    await WPFHelper.Dispatcher.InvokeAsync(() =>
+                    {
+                        this.NotifyIcon.ShowBalloonTip(
+                            Config.Instance.AppNameWithVersion,
+                            "Started",
+                            BalloonIcon.Info);
+                    },
+                    DispatcherPriority.ApplicationIdle);
+                };
             }
         }
 
