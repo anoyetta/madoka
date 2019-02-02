@@ -45,9 +45,21 @@ namespace madoka
             Config.Instance.Save();
         }
 
-        private void App_DispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
+        private void App_DispatcherUnhandledException(
+            object sender,
+            DispatcherUnhandledExceptionEventArgs e)
         {
             Config.Instance.Save();
+
+            var message = string.Empty;
+            message += "予期しない例外が発生しました。アプリケーションを終了します。\n\n";
+            message += e.Exception.ToString();
+
+            MessageBox.Show(
+                message,
+                "madoka - Faital",
+                MessageBoxButton.OK,
+                MessageBoxImage.Error);
         }
 
         private void DetectProcessLoop()
