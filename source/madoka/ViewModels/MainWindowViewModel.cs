@@ -1,5 +1,9 @@
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.Linq;
+using System.Threading.Tasks;
 using madoka.Models;
 using madoka.Views;
 using Prism.Commands;
@@ -15,6 +19,7 @@ namespace madoka.ViewModels
 
         public MainWindowViewModel()
         {
+            this.RefreshList();
             this.Config.ManagedWindowList.CollectionChanged += this.ManagedWindowList_CollectionChanged;
         }
 
@@ -23,11 +28,51 @@ namespace madoka.ViewModels
             this.Config.ManagedWindowList.CollectionChanged -= this.ManagedWindowList_CollectionChanged;
         }
 
-        private void ManagedWindowList_CollectionChanged(
+        private async void ManagedWindowList_CollectionChanged(
             object sender,
             NotifyCollectionChangedEventArgs e)
+            => await this.RefreshListAsync();
+
+        public ObservableCollection<ManagedWindowGroupModel> ManagedWindowGroupList
         {
-            throw new NotImplementedException();
+            get;
+            private set;
+        } = new ObservableCollection<ManagedWindowGroupModel>();
+
+        private async void RefreshList() => await this.RefreshListAsync();
+
+        private async Task RefreshListAsync()
+        {
+            var source = default(IEnumerable<ManagedWindowModel>);
+            lock (this.Config.ManagedWindowList)
+            {
+                source = this.Config.ManagedWindowList.ToArray();
+            }
+
+            if (!source.Any())
+            {
+                this.ManagedWindowGroupList.Clear();
+                return;
+            }
+
+            var groupedList = await Task.Run(() =>
+            {
+                return (
+                    from x in source
+                    orderby
+                    string.IsNullOrEmpty(x.Group) ? 0 : 1,
+                    x.Group,
+                    x.DisplayName.Value
+                    group x by x.Group into g
+                    select new ManagedWindowGroupModel()
+                    {
+                        GroupName = g.First().Group,
+                        Children = new ObservableCollection<ManagedWindowModel>(g)
+                    }).ToArray();
+            });
+
+            this.ManagedWindowGroupList.Clear();
+            this.ManagedWindowGroupList.AddRange(groupedList);
         }
 
         #region Commands

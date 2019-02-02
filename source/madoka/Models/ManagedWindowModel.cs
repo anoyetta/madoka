@@ -6,11 +6,9 @@ using System.IO;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Input;
 using madoka.Common;
 using Microsoft.Win32;
 using Newtonsoft.Json;
-using Prism.Commands;
 using Prism.Mvvm;
 using Reactive.Bindings;
 using Reactive.Bindings.Extensions;
@@ -70,8 +68,8 @@ namespace madoka.Models
 
             if (!string.IsNullOrEmpty(exe))
             {
-                this.DisplayName.Value = Path.GetFileNameWithoutExtension(exe);
-                return;
+                var text = Path.GetFileNameWithoutExtension(exe);
+                this.DisplayName.Value = !string.IsNullOrEmpty(text) ? text : exe;
             }
 
             this.DisplayName.Value = string.Empty;
@@ -254,26 +252,8 @@ namespace madoka.Models
             set => this.SetProperty(ref this.managedProcessID, value);
         }
 
+        [JsonIgnore]
         public bool IsLocationApplied { get; private set; }
-
-        #region Commands
-
-        private ICommand getWindowInfoCommand;
-
-        public ICommand GetWindowInfoCommand =>
-            this.getWindowInfoCommand ?? (this.getWindowInfoCommand = new DelegateCommand(async () => await this.GetWindowInfo()));
-
-        private ICommand runCommand;
-
-        public ICommand RunCommand =>
-            this.runCommand ?? (this.runCommand = new DelegateCommand(async () => await this.Run()));
-
-        private ICommand applyCommand;
-
-        public ICommand ApplyCommand =>
-            this.applyCommand ?? (this.applyCommand = new DelegateCommand(async () => await this.SetRegistry()));
-
-        #endregion Commands
 
         #region Methods
 

@@ -8,6 +8,7 @@
   xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
   xmlns:tb="http://www.hardcodet.net/taskbar"
   xmlns:vm="clr-namespace:madoka.ViewModels"
+  xmlns:model="clr-namespace:madoka.Models"
   xmlns:local="clr-namespace:madoka"
   mc:Ignorable="d"
   GlowBrush="{DynamicResource AccentColorBrush}"
@@ -65,6 +66,11 @@
       <Separator />
       <MenuItem Header="終了" Command="{Binding EndCommand, Mode=OneWay}" />
     </ContextMenu>
+
+    <Style x:Key="StretchItemStyle" TargetType="ContentPresenter">
+      <Setter Property="VerticalAlignment" Value="Stretch" />
+      <Setter Property="HorizontalAlignment" Value="Stretch" />
+    </Style>
   </metro:MetroWindow.Resources>
 
   <Grid>
@@ -76,6 +82,34 @@
       DoubleClickCommand="{Binding ShowCommand, Mode=OneWay}"
       ContextMenu="{DynamicResource NotifyIconMenu}"
       ToolTipText="{Binding Config.AppNameWithVersion, Mode=OneWay}" />
+
+    <ItemsControl
+      Margin="10"
+      Focusable="False"
+      IsTabStop="False"
+      BorderThickness="0"
+      ItemContainerStyle="{DynamicResource StretchItemStyle}"
+      ItemsSource="{Binding ManagedWindowGroupList, Mode=OneWay}">
+
+      <ItemsControl.ItemsPanel>
+        <ItemsPanelTemplate>
+          <StackPanel />
+        </ItemsPanelTemplate>
+      </ItemsControl.ItemsPanel>
+
+      <ItemsControl.ItemTemplate>
+        <DataTemplate DataType="{x:Type model:ManagedWindowGroupModel}">
+          <StackPanel>
+            <Label
+              Content="{Binding GroupName, Mode=OneWay}"
+              VerticalContentAlignment="Center"
+              Height="35"
+              FontSize="{DynamicResource NormalFontSize}" />
+            <Line Fill="{DynamicResource AccentColorBrush}" />
+          </StackPanel>
+        </DataTemplate>
+      </ItemsControl.ItemTemplate>
+    </ItemsControl>
 
     <DockPanel VerticalAlignment="Bottom" Margin="8">
       <!-- ボタンパネルL -->

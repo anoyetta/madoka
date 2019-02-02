@@ -62,19 +62,31 @@ namespace madoka
                 MessageBoxImage.Error);
         }
 
+        private volatile bool semaphore = false;
+
         private void DetectProcessLoop()
         {
             while (true)
             {
                 Thread.Sleep(TimeSpan.FromSeconds(2));
 
+                if (this.semaphore)
+                {
+                    continue;
+                }
+
                 try
                 {
+                    this.semaphore = true;
                     this.DetectProcess();
                 }
                 catch (ThreadAbortException)
                 {
                     return;
+                }
+                finally
+                {
+                    this.semaphore = false;
                 }
             }
         }

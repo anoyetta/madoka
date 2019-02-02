@@ -2,6 +2,7 @@ using System;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
+using System.Linq;
 using System.Runtime.InteropServices;
 
 namespace madoka
@@ -110,6 +111,8 @@ namespace madoka
         public static IntPtr FindWindow(
             string processName)
         {
+#if false
+
             var handle = IntPtr.Zero;
 
             var callback = new EnumWindowsDelegate((hWnd, _) =>
@@ -120,12 +123,14 @@ namespace madoka
                 GetWindowThreadProcessId(hWnd, out processId);
                 if (processId == 0)
                 {
+                    Thread.Yield();
                     return NEXT;
                 }
 
                 var p = Process.GetProcessById(processId);
                 if (p == null)
                 {
+                    Thread.Yield();
                     return NEXT;
                 }
 
@@ -135,12 +140,23 @@ namespace madoka
                     return false;
                 }
 
+                Thread.Yield();
                 return NEXT;
             });
 
             EnumWindows(callback, IntPtr.Zero);
 
             return handle;
+#else
+            var p = Process.GetProcessesByName(processName);
+            if (p == null ||
+                p.Length <= 0)
+            {
+                return IntPtr.Zero;
+            }
+
+            return p.First().MainWindowHandle;
+#endif
         }
 
         public static PROCESS_DPI_AWARENESS GetDPIState(
