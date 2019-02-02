@@ -257,4 +257,21 @@
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>@echo off
+
+if $(ConfigurationName)==Release (
+  del /q $(TargetDir)*.pdb
+
+  mkdir $(TargetDir)bin
+  move $(TargetDir)*.dll $(TargetDir)bin\
+)</PostBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PreBuildEvent>if exist $(TargetDir)bin\. (
+    rmdir /q /s $(TargetDir)bin
+)
+
+</PreBuildEvent>
+  </PropertyGroup>
 </Project>
