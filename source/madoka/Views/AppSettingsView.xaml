@@ -82,7 +82,7 @@
               <StackPanel Orientation="Horizontal">
                 <TextBlock Text="プロセスID" Width="130" />
                 <TextBlock Text=":" Width="10" />
-                <TextBlock Text="{Binding Model.ManagedProcessID}" />
+                <TextBlock Text="{Binding Model.ManagedProcessIDs, Mode=OneWay}" Width="250" TextTrimming="CharacterEllipsis" />
               </StackPanel>
               <StackPanel Orientation="Horizontal">
                 <TextBlock Text="DPIスケーリング対応" Width="130" />

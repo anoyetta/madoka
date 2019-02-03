@@ -67,6 +67,8 @@ namespace madoka.Models
                         break;
                 }
             };
+
+            this.managedProcessIDList.CollectionChanged += (_, __) => this.RaisePropertyChanged(nameof(this.ManagedProcessIDs));
         }
 
         private void SetDisplayName(
@@ -215,7 +217,7 @@ namespace madoka.Models
         public double MadokaScale
         {
             get => this.madokaScale;
-            set => this.SetProperty(ref this.madokaScale, Math.Round(value));
+            set => this.SetProperty(ref this.madokaScale, Math.Round(value, 2));
         }
 
         private NativeMethods.PROCESS_DPI_AWARENESS processDPIAwareness = NativeMethods.PROCESS_DPI_AWARENESS.PROCESS_DPI_UNAWARE;
@@ -307,7 +309,7 @@ namespace madoka.Models
         }
 
         [JsonIgnore]
-        public bool IsLocationApplied { get; private set; }
+        public string ManagedProcessIDs => string.Join(", ", this.ManagedProcessIDList);
 
         #region Methods
 
@@ -339,7 +341,16 @@ namespace madoka.Models
                 };
 
                 var p = Process.Start(pi);
-                p.WaitForInputIdle();
+                await Task.Delay(10);
+
+                try
+                {
+                    p.WaitForInputIdle();
+                }
+                catch (InvalidOperationException)
+                {
+                    await Task.Delay(200);
+                }
 
                 await Application.Current.Dispatcher.InvokeAsync(() =>
                 {
