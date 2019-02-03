@@ -1,0 +1,349 @@
+<metro:MetroWindow
+  x:Class="madoka.MainWindow"
+  x:Name="BaseWindow"
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:metro="http://metro.mahapps.com/winfx/xaml/controls"
+  xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+  xmlns:material="http://materialdesigninxaml.net/winfx/xaml/themes"
+  xmlns:tb="http://www.hardcodet.net/taskbar"
+  xmlns:vm="clr-namespace:madoka.ViewModels"
+  xmlns:model="clr-namespace:madoka.Models"
+  xmlns:local="clr-namespace:madoka"
+  mc:Ignorable="d"
+  GlowBrush="{DynamicResource AccentColorBrush}"
+  TextOptions.TextFormattingMode="Ideal"
+  TextOptions.TextRenderingMode="ClearType"
+  TextOptions.TextHintingMode="Auto"
+  RenderOptions.EdgeMode="Unspecified"
+  RenderOptions.BitmapScalingMode="Fant"
+  RenderOptions.ClearTypeHint="Enabled"
+  TextElement.FontWeight="Regular"
+  TitleCharacterCasing="Normal"
+  Title="{Binding Config.AppName, Mode=OneWay}"
+  TitlebarHeight="41"
+  Icon="madoka.ico"
+  d:DataContext="{d:DesignInstance {x:Type vm:MainWindowViewModel}, IsDesignTimeCreatable=True}"
+  Top="{Binding Config.MainWindowY, Mode=TwoWay}"
+  Left="{Binding Config.MainWindowX, Mode=TwoWay}"
+  Width="{Binding Config.MainWindowW, Mode=TwoWay}"
+  Height="{Binding Config.MainWindowH, Mode=TwoWay}">
+
+  <metro:MetroWindow.DataContext>
+    <vm:MainWindowViewModel />
+  </metro:MetroWindow.DataContext>
+
+  <metro:MetroWindow.LayoutTransform>
+    <ScaleTransform ScaleX="{Binding Config.Scale, Mode=OneWay}" ScaleY="{Binding Config.Scale, Mode=OneWay}" />
+  </metro:MetroWindow.LayoutTransform>
+
+  <metro:MetroWindow.IconTemplate>
+    <DataTemplate>
+      <Image Source="{Binding}" Width="30" Height="30" Margin="5" />
+    </DataTemplate>
+  </metro:MetroWindow.IconTemplate>
+
+  <d:DesignerProperties.DesignStyle>
+    <Style TargetType="{x:Type metro:MetroWindow}">
+      <Setter Property="Background" Value="White" />
+    </Style>
+  </d:DesignerProperties.DesignStyle>
+
+  <metro:MetroWindow.Resources>
+    <ToolTip x:Key="NotifyIconToolTip" Content="madoka" />
+
+    <ContextMenu x:Key="NotifyIconMenu" MinWidth="200">
+      <ContextMenu.Resources>
+        <Style TargetType="MenuItem" BasedOn="{StaticResource MetroMenuItem}">
+          <Setter Property="Height" Value="30" />
+        </Style>
+      </ContextMenu.Resources>
+
+      <MenuItem Header="{Binding Config.AppName, Mode=OneWay}" Command="{Binding ShowCommand, Mode=OneWay}" FontWeight="Bold" FontSize="18" Height="36" IsHitTestVisible="False" />
+      <MenuItem Header="表示" Command="{Binding ShowCommand, Mode=OneWay}" />
+      <Separator />
+      <MenuItem Header="設定" Command="{Binding ShowConfigCommand, Mode=OneWay}" />
+      <Separator />
+      <MenuItem Header="終了" Command="{Binding EndCommand, Mode=OneWay}" />
+    </ContextMenu>
+
+    <Style x:Key="StretchItemStyle" TargetType="ContentPresenter">
+      <Setter Property="VerticalAlignment" Value="Stretch" />
+      <Setter Property="HorizontalAlignment" Value="Stretch" />
+    </Style>
+  </metro:MetroWindow.Resources>
+
+  <Grid>
+
+    <tb:TaskbarIcon
+      x:Name="NotifyIcon"
+      IconSource="madoka.ico"
+      Visibility="Collapsed"
+      DoubleClickCommand="{Binding ShowCommand, Mode=OneWay}"
+      ContextMenu="{DynamicResource NotifyIconMenu}"
+      ToolTipText="{Binding Config.AppNameWithVersion, Mode=OneWay}" />
+
+    <!-- Group Items -->
+    <ItemsControl
+      Margin="10 15"
+      Focusable="False"
+      IsTabStop="False"
+      BorderThickness="0"
+      ItemContainerStyle="{DynamicResource StretchItemStyle}"
+      ItemsSource="{Binding ManagedWindowGroupList, Mode=OneWay}">
+
+      <ItemsControl.ItemsPanel>
+        <ItemsPanelTemplate>
+          <StackPanel />
+        </ItemsPanelTemplate>
+      </ItemsControl.ItemsPanel>
+
+      <ItemsControl.ItemTemplate>
+        <DataTemplate DataType="{x:Type model:ManagedWindowGroupModel}">
+          <StackPanel>
+            <DockPanel>
+              <Label
+                Content="{Binding GroupName, Mode=OneWay}"
+                HorizontalAlignment="Left"
+                VerticalContentAlignment="Center"
+                Height="35"
+                Foreground="{DynamicResource GrayBrush1}"
+                FontSize="{DynamicResource NormalFontSize}"
+                Visibility="{Binding IsExistsGroupName, Mode=OneWay, Converter={StaticResource VisibilityConverter}}" />
+
+              <Button
+                Width="35" Height="35"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Center"
+                Visibility="{Binding IsExistsGroupName, Mode=OneWay, Converter={StaticResource VisibilityConverter}}"
+                Style="{DynamicResource IconButtonStyle}"
+                Background="{DynamicResource WhiteBrush}"
+                Command="{Binding ElementName=BaseWindow, Path=DataContext.RunGroupAppsCommand, Mode=OneWay}"
+                CommandParameter="{Binding}">
+                <Viewbox>
+                  <iconPacks:PackIconMaterial Kind="Power" Padding="3" Foreground="{DynamicResource HighlightBrush}" />
+                </Viewbox>
+              </Button>
+            </DockPanel>
+
+            <Label
+              Height="1"
+              Margin="0 0 0 5"
+              Background="{DynamicResource GrayBrush3}"
+              Visibility="{Binding IsExistsGroupName, Mode=OneWay, Converter={StaticResource VisibilityConverter}}" />
+
+            <!-- Applicatin Items -->
+            <ItemsControl
+              Margin="0 0 0 15"
+              ItemsSource="{Binding Children, Mode=OneWay}"
+              Focusable="False"
+              IsTabStop="False"
+              BorderThickness="0"
+              ItemContainerStyle="{DynamicResource StretchItemStyle}">
+
+              <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                  <WrapPanel Orientation="Horizontal" />
+                </ItemsPanelTemplate>
+              </ItemsControl.ItemsPanel>
+
+              <ItemsControl.ItemTemplate>
+                <DataTemplate DataType="{x:Type model:ManagedWindowModel}">
+                  <Border
+                    Padding="15 10"
+                    Margin="0 0 15 15"
+                    CornerRadius="6"
+                    Width="300"
+                    Height="130"
+                    TextElement.Foreground="{DynamicResource WhiteBrush}"
+                    MouseLeftButtonDown="ModelPanel_MouseLeftButtonDown">
+                    <Border.Style>
+                      <Style TargetType="Border">
+                        <Style.Triggers>
+                          <DataTrigger Binding="{Binding IsEnabled, Mode=OneWay}" Value="True">
+                            <Setter Property="Background" Value="{DynamicResource AccentColorBrush2}" />
+                          </DataTrigger>
+                          <DataTrigger Binding="{Binding IsEnabled, Mode=OneWay}" Value="False">
+                            <Setter Property="Background" Value="{DynamicResource GrayBrush2}" />
+                          </DataTrigger>
+                        </Style.Triggers>
+                      </Style>
+                    </Border.Style>
+
+                    <Grid>
+                      <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition Width="Auto" />
+                      </Grid.ColumnDefinitions>
+                      <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition />
+                      </Grid.RowDefinitions>
+
+                      <StackPanel
+                        Grid.Column="0"
+                        Grid.Row="1"
+                        VerticalAlignment="Bottom">
+                        <StackPanel Orientation="Horizontal">
+                          <TextBlock Text="{Binding X, Mode=OneWay, StringFormat=X:{0}}" />
+                          <TextBlock Margin="8 0 0 0" Text="{Binding Y, Mode=OneWay, StringFormat=Y:{0}}" />
+                          <TextBlock Margin="16 0 2 0" Text="{Binding W, Mode=OneWay}" />
+                          <TextBlock Text="x" />
+                          <TextBlock Margin="2 0 0 0" Text="{Binding H, Mode=OneWay}" />
+                        </StackPanel>
+                        <TextBlock Text="{Binding ScalingMode, Mode=OneWay, StringFormat=Scaling:{0}}" />
+                      </StackPanel>
+
+                      <DockPanel
+                        Grid.Column="1"
+                        Grid.RowSpan="2"
+                        Margin="8 0 0 0">
+
+                        <!-- Power button -->
+                        <Button
+                          Width="35" Height="35"
+                          DockPanel.Dock="Top"
+                          VerticalAlignment="Top"
+                          Visibility="{Binding IsEnabled, Mode=OneWay, Converter={StaticResource VisibilityConverter}}"
+                          Style="{DynamicResource IconButtonStyle}"
+                          Background="{DynamicResource WhiteBrush}"
+                          Command="{Binding ElementName=BaseWindow, Path=DataContext.RunAppCommand, Mode=OneWay}"
+                          CommandParameter="{Binding}">
+                          <Viewbox Margin="1 0 0 0" Width="32">
+                            <iconPacks:PackIconMaterial Kind="Power" Padding="3">
+                              <iconPacks:PackIconMaterial.Effect>
+                                <DropShadowEffect
+                                  Direction="0"
+                                  ShadowDepth="0"
+                                  BlurRadius="2"
+                                  Color="#e83929"
+                                  Opacity="{Binding IsRunning, Mode=OneWay, Converter={StaticResource BooleanToIntConverter}}" />
+                              </iconPacks:PackIconMaterial.Effect>
+
+                              <iconPacks:PackIconMaterial.Style>
+                                <Style TargetType="iconPacks:PackIconMaterial">
+                                  <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsRunning, Mode=OneWay}" Value="True">
+                                      <Setter Property="Foreground" Value="#e83929" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding IsRunning, Mode=OneWay}" Value="False">
+                                      <Setter Property="Foreground" Value="{DynamicResource GrayBrush2}" />
+                                    </DataTrigger>
+                                  </Style.Triggers>
+                                </Style>
+                              </iconPacks:PackIconMaterial.Style>
+                            </iconPacks:PackIconMaterial>
+                          </Viewbox>
+                        </Button>
+
+                        <!-- Lauout button -->
+                        <Button
+                          Width="35" Height="35"
+                          DockPanel.Dock="Top"
+                          VerticalAlignment="Top"
+                          Margin="0 5 0 0"
+                          Visibility="{Binding IsEnabled, Mode=OneWay, Converter={StaticResource VisibilityConverter}}"
+                          Style="{DynamicResource IconButtonStyle}"
+                          Background="{DynamicResource AccentColorBrush}"
+                          ToolTip="レイアウトを適用する"
+                          Command="{Binding ElementName=BaseWindow, Path=DataContext.ApplyLayoutCommand, Mode=OneWay}"
+                          CommandParameter="{Binding}">
+                          <iconPacks:PackIconMaterial Kind="VectorArrangeAbove" Foreground="{DynamicResource IdealForegroundColorBrush}">
+                            <iconPacks:PackIconMaterial.LayoutTransform>
+                              <ScaleTransform ScaleX="1.2" ScaleY="1.2" />
+                            </iconPacks:PackIconMaterial.LayoutTransform>
+                          </iconPacks:PackIconMaterial>
+                        </Button>
+
+                        <metro:ToggleSwitch
+                          DockPanel.Dock="Bottom"
+                          VerticalAlignment="Bottom"
+                          Margin="0 0 -2 0"
+                          Content=""
+                          Style="{StaticResource MahApps.Metro.Styles.ToggleSwitch.Win10}"
+                          IsChecked="{Binding IsEnabled, Mode=TwoWay}">
+                        </metro:ToggleSwitch>
+                      </DockPanel>
+
+                      <!-- 表示名 -->
+                      <TextBlock
+                        Grid.Column="0"
+                        Grid.Row="0"
+                        Text="{Binding DisplayName, Mode=OneWay}"
+                        FontSize="{DynamicResource FlyoutHeaderFontSize}"
+                        TextTrimming="CharacterEllipsis" />
+                    </Grid>
+                  </Border>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+              <!-- Application Template end -->
+            </ItemsControl>
+            <!-- Applicatin Items end -->
+          </StackPanel>
+        </DataTemplate>
+      </ItemsControl.ItemTemplate>
+      <!-- Group Template end -->
+    </ItemsControl>
+    <!-- Group Items end -->
+
+    <DockPanel VerticalAlignment="Bottom" Margin="8">
+      <!-- ボタンパネルL -->
+      <StackPanel DockPanel.Dock="Left" HorizontalAlignment="Left" Orientation="Horizontal">
+        <Button
+          Width="45"
+          Height="45"
+          Style="{DynamicResource IconButtonStyle}"
+          Command="{Binding ShowConfigCommand, Mode=OneWay}">
+          <iconPacks:PackIconMaterial Kind="Settings"  Foreground="{DynamicResource IdealForegroundColorBrush}">
+            <iconPacks:PackIconMaterial.LayoutTransform>
+              <ScaleTransform ScaleX="1.3" ScaleY="1.3" />
+            </iconPacks:PackIconMaterial.LayoutTransform>
+          </iconPacks:PackIconMaterial>
+        </Button>
+
+        <Button
+          Width="45"
+          Height="45"
+          Margin="10 0 0 0"
+          Style="{DynamicResource IconButtonStyle}"
+          Command="{Binding EndCommand, Mode=OneWay}">
+          <iconPacks:PackIconMaterial Kind="ExitToApp"  Foreground="{DynamicResource IdealForegroundColorBrush}">
+            <iconPacks:PackIconMaterial.LayoutTransform>
+              <ScaleTransform ScaleX="1.3" ScaleY="1.3" />
+            </iconPacks:PackIconMaterial.LayoutTransform>
+          </iconPacks:PackIconMaterial>
+        </Button>
+      </StackPanel>
+
+      <!-- ボタンパネルR -->
+      <StackPanel DockPanel.Dock="Right" HorizontalAlignment="Right" Orientation="Horizontal">
+        <Button
+          Width="45"
+          Height="45"
+          Style="{DynamicResource IconButtonStyle}"
+          Command="{Binding AddCommand, Mode=OneWay}">
+          <iconPacks:PackIconMaterial Kind="Plus"  Foreground="{DynamicResource IdealForegroundColorBrush}">
+            <iconPacks:PackIconMaterial.LayoutTransform>
+              <ScaleTransform ScaleX="1.2" ScaleY="1.2" />
+            </iconPacks:PackIconMaterial.LayoutTransform>
+          </iconPacks:PackIconMaterial>
+        </Button>
+      </StackPanel>
+    </DockPanel>
+
+    <material:Snackbar
+      x:Name="Snackbar"
+      HorizontalAlignment="Center"
+      VerticalAlignment="Bottom"
+      HorizontalContentAlignment="Center"
+      VerticalContentAlignment="Center"
+      FontSize="{DynamicResource TabItemFontSize}"
+      Background="{DynamicResource GrayBrush2}"
+      Foreground="{DynamicResource WhiteBrush}"
+      Opacity="0.95"
+      Margin="0 0 0 20"
+      MessageQueue="{material:MessageQueue}" />
+  </Grid>
+</metro:MetroWindow>

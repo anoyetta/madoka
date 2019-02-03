@@ -1,0 +1,7 @@
+コンピューター\HKEY_CURRENT_USER\Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers
+
+RUNASADMIN
+
+HIGHDPIAWARE
+DPIUNAWARE
+GDIDPISCALING DPIUNAWARE
