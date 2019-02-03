@@ -7,6 +7,7 @@
   xmlns:local="clr-namespace:madoka.Views"
   xmlns:metro="http://metro.mahapps.com/winfx/xaml/controls"
   xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+  xmlns:material="http://materialdesigninxaml.net/winfx/xaml/themes"
   xmlns:vm="clr-namespace:madoka.ViewModels"
   xmlns:model="clr-namespace:madoka.Models"
   xmlns:prism="http://prismlibrary.com/"
@@ -36,197 +37,241 @@
     <Thickness x:Key="ContentMargin">0 15 0 0</Thickness>
   </metro:MetroWindow.Resources>
 
-  <Grid Margin="0">
-    <Grid.RowDefinitions>
-      <RowDefinition />
-      <RowDefinition Height="Auto" />
-    </Grid.RowDefinitions>
+  <Grid>
+    <Grid>
+      <Grid.RowDefinitions>
+        <RowDefinition />
+        <RowDefinition Height="Auto" />
+      </Grid.RowDefinitions>
 
-    <!-- 横レイアウト Panel -->
-    <StackPanel Grid.Row="0" Orientation="Horizontal">
+      <!-- 横レイアウト Panel -->
+      <StackPanel Grid.Row="0" Orientation="Horizontal">
 
-      <!-- 1番目 Panel -->
-      <GroupBox Header="基本" Padding="15" Margin="5" Width="500">
-        <DockPanel>
-          <StackPanel DockPanel.Dock="Top">
-            <metro:MetroHeader Header="アプリケーションのパス">
-              <TextBox Text="{Binding Model.Exe, Mode=TwoWay}" />
-            </metro:MetroHeader>
+        <!-- 1番目 Panel -->
+        <GroupBox Header="基本" Padding="15" Margin="5" Width="500">
+          <DockPanel>
+            <StackPanel DockPanel.Dock="Top">
+              <metro:MetroHeader Header="アプリケーションのパス">
+                <TextBox Text="{Binding Model.Exe, Mode=TwoWay}" />
+              </metro:MetroHeader>
 
-            <metro:MetroHeader Header="作業ディレクトリ (Optional)" Margin="{DynamicResource ContentMargin}">
-              <TextBox Text="{Binding Model.WorkingDirectory, Mode=TwoWay}" />
-            </metro:MetroHeader>
+              <metro:MetroHeader Header="作業ディレクトリ (Optional)" Margin="{DynamicResource ContentMargin}">
+                <TextBox Text="{Binding Model.WorkingDirectory, Mode=TwoWay}" />
+              </metro:MetroHeader>
 
-            <metro:MetroHeader Header="引数 (Optional)" Margin="{DynamicResource ContentMargin}">
-              <TextBox Text="{Binding Model.Arguments, Mode=TwoWay}" />
-            </metro:MetroHeader>
+              <metro:MetroHeader Header="引数 (Optional)" Margin="{DynamicResource ContentMargin}">
+                <TextBox Text="{Binding Model.Arguments, Mode=TwoWay}" />
+              </metro:MetroHeader>
 
-            <metro:MetroHeader Header="表示名 (Optional)" Margin="{DynamicResource ContentMargin}">
-              <TextBox Text="{Binding Model.Name, Mode=TwoWay}" />
-            </metro:MetroHeader>
+              <metro:MetroHeader Header="表示名 (Optional)" Margin="{DynamicResource ContentMargin}">
+                <TextBox Text="{Binding Model.Name, Mode=TwoWay}" />
+              </metro:MetroHeader>
 
-            <metro:MetroHeader Header="グループ (Optional)" Margin="{DynamicResource ContentMargin}">
-              <TextBox Text="{Binding Model.Group, Mode=TwoWay}" />
-            </metro:MetroHeader>
-          </StackPanel>
+              <metro:MetroHeader Header="グループ (Optional)" Margin="{DynamicResource ContentMargin}">
+                <TextBox Text="{Binding Model.Group, Mode=TwoWay}" />
+              </metro:MetroHeader>
 
-          <StackPanel VerticalAlignment="Bottom" DockPanel.Dock="Bottom">
-            <StackPanel Orientation="Horizontal">
-              <TextBlock Text="プロセスID" Width="130" />
-              <TextBlock Text=":" Width="10" />
-              <TextBlock Text="{Binding Model.ManagedProcessID}" />
+              <metro:ToggleSwitch
+                Style="{StaticResource MahApps.Metro.Styles.ToggleSwitch.Win10}"
+                Margin="0 25 0 0"
+                HorizontalAlignment="Left"
+                IsChecked="{Binding Model.IsEnabled, Mode=TwoWay}" />
             </StackPanel>
-            <StackPanel Orientation="Horizontal">
-              <TextBlock Text="DPIスケーリング対応" Width="130" />
-              <TextBlock Text=":" Width="10" />
-              <TextBlock Text="{Binding Model.ProcessDPIAwareness, Mode=OneWay, Converter={StaticResource EnumToDisplayNameConverter}}" />
-            </StackPanel>
-          </StackPanel>
-        </DockPanel>
-      </GroupBox>
-      <!-- 1番目 Panel end -->
 
-      <!-- 2番目 Panel -->
-      <StackPanel>
-        <GroupBox Header="レイアウト" Padding="15" Margin="5" MinWidth="400">
-          <StackPanel>
-            <StackPanel Orientation="Horizontal">
-              <StackPanel>
-                <metro:MetroHeader Header="位置">
-                  <StackPanel Orientation="Horizontal">
-                    <CheckBox IsChecked="{Binding Model.IsSetLocation, Mode=TwoWay}" Margin="0 0 15 0" ToolTip="位置を指定する" />
-
-                    <Label Content="X" Width="30" />
-                    <metro:NumericUpDown Width="100" StringFormat="N0" HorizontalContentAlignment="Right" Value="{Binding Model.X, Mode=TwoWay}" IsEnabled="{Binding Model.IsSetLocation, Mode=OneWay}" />
-                    <Label Content="Y" Width="30" Margin="20 0 0 0" />
-                    <metro:NumericUpDown Width="100" StringFormat="N0" HorizontalContentAlignment="Right" Value="{Binding Model.Y, Mode=TwoWay}" IsEnabled="{Binding Model.IsSetLocation, Mode=OneWay}" />
-                  </StackPanel>
-                </metro:MetroHeader>
-
-                <metro:MetroHeader Header="サイズ" Margin="{DynamicResource ContentMargin}">
-                  <StackPanel Orientation="Horizontal">
-                    <CheckBox IsChecked="{Binding Model.IsSetSize, Mode=TwoWay}" Margin="0 0 15 0" ToolTip="サイズを指定する" />
-
-                    <Label Content="W" Width="30" />
-                    <metro:NumericUpDown Width="100" StringFormat="N0" HorizontalContentAlignment="Right" Value="{Binding Model.W, Mode=TwoWay}" IsEnabled="{Binding Model.IsSetSize, Mode=OneWay}" />
-                    <Label Content="H" Width="30" Margin="20 0 0 0" />
-                    <metro:NumericUpDown Width="100" StringFormat="N0" HorizontalContentAlignment="Right" Value="{Binding Model.H, Mode=TwoWay}" IsEnabled="{Binding Model.IsSetSize, Mode=OneWay}" />
-                  </StackPanel>
-                </metro:MetroHeader>
-
-                <CheckBox
-                  Margin="0 20 0 0"
-                  IsChecked="{Binding Model.IsLockLocation, Mode=TwoWay}"
-                  Content="レイアウトを固定する"
-                  ToolTip="ウィンドウを移動、リサイズしても指定した位置、サイズに復帰させます。" />
+            <StackPanel VerticalAlignment="Bottom" DockPanel.Dock="Bottom">
+              <StackPanel Orientation="Horizontal">
+                <TextBlock Text="プロセスID" Width="130" />
+                <TextBlock Text=":" Width="10" />
+                <TextBlock Text="{Binding Model.ManagedProcessID}" />
+              </StackPanel>
+              <StackPanel Orientation="Horizontal">
+                <TextBlock Text="DPIスケーリング対応" Width="130" />
+                <TextBlock Text=":" Width="10" />
+                <TextBlock Text="{Binding Model.ProcessDPIAwareness, Mode=OneWay, Converter={StaticResource EnumToDisplayNameConverter}}" />
               </StackPanel>
             </StackPanel>
-
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-              <TextBlock><Hyperlink Command="{Binding ApplyLayoutCommand, Mode=OneWay}">Apply</Hyperlink></TextBlock>
-            </StackPanel>
-          </StackPanel>
+          </DockPanel>
         </GroupBox>
+        <!-- 1番目 Panel end -->
 
-        <GroupBox Header="互換性とスケーリング" Padding="15" Margin="5">
-          <StackPanel>
-            <CheckBox
-              Content="管理者として実行する"
-              IsChecked="{Binding Model.IsRunAs, Mode=TwoWay}" />
+        <!-- 2番目 Panel -->
+        <StackPanel>
+          <GroupBox Header="レイアウト" Padding="15" Margin="5" MinWidth="400">
+            <StackPanel>
+              <StackPanel Orientation="Horizontal">
+                <StackPanel>
+                  <metro:MetroHeader Header="位置">
+                    <StackPanel Orientation="Horizontal">
+                      <metro:ToggleSwitch
+                        Style="{StaticResource MahApps.Metro.Styles.ToggleSwitch.Win10}"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Center"
+                        Margin="0 0 10 0"
+                        IsChecked="{Binding Model.IsSetLocation, Mode=TwoWay}"
+                        Content=""
+                        ToolTip="位置を指定する" />
 
-            <metro:MetroHeader Header="このアプリケーションのDPIスケーリングモード" Margin="0 20 0 0">
-              <StackPanel Orientation="Horizontal" Margin="0 10 0 0">
-                <ComboBox
-                  Width="150"
-                  ItemsSource="{Binding DPIAwaresValues, Mode=OneWay}"
-                  SelectedValue="{Binding Model.DPIAware, Mode=TwoWay}"
-                  SelectedValuePath="Value"
-                  DisplayMemberPath="Display" />
+                      <Label Content="X" Width="30" />
+                      <metro:NumericUpDown Width="100" StringFormat="N0" HorizontalContentAlignment="Right" Value="{Binding Model.X, Mode=TwoWay}" IsEnabled="{Binding Model.IsSetLocation, Mode=OneWay}" />
+                      <Label Content="Y" Width="30" Margin="20 0 0 0" />
+                      <metro:NumericUpDown Width="100" StringFormat="N0" HorizontalContentAlignment="Right" Value="{Binding Model.Y, Mode=TwoWay}" IsEnabled="{Binding Model.IsSetLocation, Mode=OneWay}" />
+                    </StackPanel>
+                  </metro:MetroHeader>
+
+                  <metro:MetroHeader Header="サイズ" Margin="{DynamicResource ContentMargin}">
+                    <StackPanel Orientation="Horizontal">
+                      <metro:ToggleSwitch
+                        Style="{StaticResource MahApps.Metro.Styles.ToggleSwitch.Win10}"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Center"
+                        Margin="0 0 10 0"
+                        IsChecked="{Binding Model.IsSetSize, Mode=TwoWay}"
+                        Content=""
+                        ToolTip="位置をサイズを指定する" />
+
+                      <Label Content="W" Width="30" />
+                      <metro:NumericUpDown Width="100" StringFormat="N0" HorizontalContentAlignment="Right" Value="{Binding Model.W, Mode=TwoWay}" IsEnabled="{Binding Model.IsSetSize, Mode=OneWay}" />
+                      <Label Content="H" Width="30" Margin="20 0 0 0" />
+                      <metro:NumericUpDown Width="100" StringFormat="N0" HorizontalContentAlignment="Right" Value="{Binding Model.H, Mode=TwoWay}" IsEnabled="{Binding Model.IsSetSize, Mode=OneWay}" />
+                    </StackPanel>
+                  </metro:MetroHeader>
+
+                  <metro:ToggleSwitch
+                    Style="{StaticResource MahApps.Metro.Styles.ToggleSwitch.Win10}"
+                    Margin="0 30 0 0"
+                    HorizontalAlignment="Left"
+                    IsChecked="{Binding Model.IsLockLocation, Mode=TwoWay}"
+                    Content="レイアウトを固定する"
+                    ToolTip="ウィンドウを移動、リサイズしても指定した位置、サイズに復帰させます。" />
+                </StackPanel>
               </StackPanel>
-            </metro:MetroHeader>
 
-            <metro:MetroHeader Header="madoka スケーリング" Margin="{DynamicResource ContentMargin}">
-              <StackPanel Margin="0 10 0 0">
-                <CheckBox Content="madoka でスケーリングする" />
-                <Grid Margin="0 10 0 0">
-                  <Grid.ColumnDefinitions>
-                    <ColumnDefinition />
-                    <ColumnDefinition Width="Auto" />
-                  </Grid.ColumnDefinitions>
-                  <Slider
-                  x:Name="MadokaScaleSlider"
-                  Grid.Column="0"
-                  Minimum="0.00"
-                  Maximum="8.00"
-                  LargeChange="0.01"
-                  SmallChange="0.01"
-                  TickFrequency="0.5"
-                  TickPlacement="Both" />
-                  <TextBlock
-                  Grid.Column="1"
-                  Width="50"
-                  TextAlignment="Right"
-                  Text="{Binding ElementName=MadokaScaleSlider, Path=Value, Mode=OneWay, StringFormat=N2}" />
-                </Grid>
+              <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <TextBlock><Hyperlink Command="{Binding ApplyLayoutCommand, Mode=OneWay}">Apply</Hyperlink></TextBlock>
+              </StackPanel>
+            </StackPanel>
+          </GroupBox>
 
-                <TextBlock Margin="0 20 0 0" HorizontalAlignment="Right">
+          <GroupBox Header="互換性とスケーリング" Padding="15" Margin="5">
+            <StackPanel>
+              <metro:ToggleSwitch
+                Style="{StaticResource MahApps.Metro.Styles.ToggleSwitch.Win10}"
+                HorizontalAlignment="Left"
+                IsChecked="{Binding Model.IsRunAs, Mode=TwoWay}"
+                Content="管理者として実行する" />
+
+              <metro:MetroHeader Header="このアプリケーションのDPIスケーリングモード" Margin="0 20 0 0">
+                <StackPanel Orientation="Horizontal" Margin="0 10 0 0">
+                  <ComboBox
+                    Width="150"
+                    ItemsSource="{Binding DPIAwaresValues, Mode=OneWay}"
+                    SelectedValue="{Binding Model.DPIAware, Mode=TwoWay}"
+                    SelectedValuePath="Value"
+                    DisplayMemberPath="Display" />
+                </StackPanel>
+              </metro:MetroHeader>
+
+              <metro:MetroHeader Header="madoka スケーリング" Margin="{DynamicResource ContentMargin}">
+                <StackPanel Margin="0 10 0 0">
+                  <metro:ToggleSwitch
+                    Style="{StaticResource MahApps.Metro.Styles.ToggleSwitch.Win10}"
+                    HorizontalAlignment="Left"
+                    IsChecked="{Binding Model.IsMadokaScaling, Mode=TwoWay}"
+                    Content="madoka でスケーリングする" />
+                  <Grid Margin="0 10 0 0">
+                    <Grid.ColumnDefinitions>
+                      <ColumnDefinition />
+                      <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <Slider
+                      x:Name="MadokaScaleSlider"
+                      Value="{Binding Model.MadokaScale, Mode=TwoWay}"
+                      Grid.Column="0"
+                      Minimum="0.00"
+                      Maximum="8.00"
+                      LargeChange="0.01"
+                      SmallChange="0.01"
+                      TickFrequency="0.5"
+                      TickPlacement="Both" />
+                    <TextBlock
+                      Grid.Column="1"
+                      Width="50"
+                      TextAlignment="Right"
+                      Text="{Binding ElementName=MadokaScaleSlider, Path=Value, Mode=OneWay, StringFormat=N2}" />
+                  </Grid>
+
+                  <TextBlock Margin="0 20 0 0" HorizontalAlignment="Right">
                   <Hyperlink Command="{Binding ApplyScalingCommand, Mode=OneWay}">Apply</Hyperlink>
-                </TextBlock>
-              </StackPanel>
-            </metro:MetroHeader>
-          </StackPanel>
-        </GroupBox>
+                  </TextBlock>
+                </StackPanel>
+              </metro:MetroHeader>
+            </StackPanel>
+          </GroupBox>
+        </StackPanel>
+        <!-- 2番目 Panel end -->
       </StackPanel>
-      <!-- 2番目 Panel end -->
-    </StackPanel>
-    <!-- 横レイアウト Panel end -->
+      <!-- 横レイアウト Panel end -->
 
-    <!-- ボタン Panel -->
-    <DockPanel Grid.Row="1" Margin="5">
-      <StackPanel
-        DockPanel.Dock="Left"
-        HorizontalAlignment="Left">
-        <TextBlock>
+      <!-- ボタン Panel -->
+      <DockPanel Grid.Row="1" Margin="5">
+        <StackPanel
+          DockPanel.Dock="Left"
+          HorizontalAlignment="Left">
+          <TextBlock>
           <Hyperlink Command="{Binding GetProcessInfoCommand, Mode=OneWay}">現在の情報を取得する</Hyperlink>
-        </TextBlock>
-      </StackPanel>
+          </TextBlock>
+        </StackPanel>
 
-      <StackPanel
-        DockPanel.Dock="Right"
-        HorizontalAlignment="Right"
-        Orientation="Horizontal">
+        <StackPanel
+          DockPanel.Dock="Right"
+          HorizontalAlignment="Right"
+          Orientation="Horizontal">
 
-        <Button
-          Width="30" Height="30"
-          Style="{DynamicResource IconButtonStyle}"
-          VerticalAlignment="Bottom"
-          Command="{Binding DeleteCommand, Mode=OneWay}">
-          <iconPacks:PackIconMaterial Kind="Delete"  Foreground="{DynamicResource IdealForegroundColorBrush}">
-            <iconPacks:PackIconMaterial.LayoutTransform>
-              <ScaleTransform ScaleX="0.8" ScaleY="0.8" />
-            </iconPacks:PackIconMaterial.LayoutTransform>
-          </iconPacks:PackIconMaterial>
-        </Button>
+          <Button
+            Width="30" Height="30"
+            Style="{DynamicResource IconButtonStyle}"
+            VerticalAlignment="Bottom"
+            Command="{Binding DeleteCommand, Mode=OneWay}">
+            <iconPacks:PackIconMaterial Kind="Delete"  Foreground="{DynamicResource IdealForegroundColorBrush}">
+              <iconPacks:PackIconMaterial.LayoutTransform>
+                <ScaleTransform ScaleX="0.8" ScaleY="0.8" />
+              </iconPacks:PackIconMaterial.LayoutTransform>
+            </iconPacks:PackIconMaterial>
+          </Button>
 
-        <Button
-          Width="39" Height="39"
-          Margin="15 0 0 0"
-          Style="{DynamicResource IconButtonStyle}"
-          Command="{Binding RunCommand, Mode=OneWay}"
-          ToolTip="アプリケーションを起動する">
-          <iconPacks:PackIconMaterial Kind="Power"  Foreground="{DynamicResource IdealForegroundColorBrush}" />
-        </Button>
+          <Button
+            Width="39" Height="39"
+            Margin="15 0 0 0"
+            Style="{DynamicResource IconButtonStyle}"
+            Command="{Binding RunCommand, Mode=OneWay}"
+            ToolTip="アプリケーションを起動する">
+            <iconPacks:PackIconMaterial Kind="Power"  Foreground="{DynamicResource IdealForegroundColorBrush}" />
+          </Button>
 
-        <Button
-          Width="39" Height="39"
-          Margin="10 0 0 0"
-          Style="{DynamicResource IconButtonStyle}"
-          Command="{Binding CheckCommand, Mode=OneWay}"
-          IsDefault="True">
-          <iconPacks:PackIconMaterial Kind="Check"  Foreground="{DynamicResource IdealForegroundColorBrush}" />
-        </Button>
-      </StackPanel>
-    </DockPanel>
-    <!-- ボタン Panel end -->
+          <Button
+            Width="39" Height="39"
+            Margin="10 0 0 0"
+            Style="{DynamicResource IconButtonStyle}"
+            Command="{Binding CheckCommand, Mode=OneWay}"
+            IsDefault="True">
+            <iconPacks:PackIconMaterial Kind="Check"  Foreground="{DynamicResource IdealForegroundColorBrush}" />
+          </Button>
+        </StackPanel>
+      </DockPanel>
+      <!-- ボタン Panel end -->
+    </Grid>
+
+    <material:Snackbar
+      x:Name="Snackbar"
+      HorizontalAlignment="Center"
+      VerticalAlignment="Bottom"
+      HorizontalContentAlignment="Center"
+      VerticalContentAlignment="Center"
+      FontSize="{DynamicResource TabItemFontSize}"
+      Background="{DynamicResource GrayBrush2}"
+      Foreground="{DynamicResource WhiteBrush}"
+      Opacity="0.95"
+      Margin="0 0 0 5"
+      MessageQueue="{material:MessageQueue}" />
   </Grid>
 </metro:MetroWindow>

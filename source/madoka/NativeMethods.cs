@@ -1,8 +1,6 @@
 using System;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.Diagnostics;
-using System.Linq;
 using System.Runtime.InteropServices;
 
 namespace madoka
@@ -108,6 +106,7 @@ namespace madoka
         [DllImport("Shcore.dll")]
         private static extern int GetProcessDpiAwareness(IntPtr hprocess, out PROCESS_DPI_AWARENESS value);
 
+#if false
         public static IntPtr FindWindow(
             string processName)
         {
@@ -158,6 +157,7 @@ namespace madoka
             return p.First().MainWindowHandle;
 #endif
         }
+#endif
 
         public static PROCESS_DPI_AWARENESS GetDPIState(
             uint processId)

@@ -44,6 +44,7 @@
       <BooleanToVisibilityConverter x:Key="VisibilityConverter" />
       <fw:BooleanToHiddenConverter x:Key="HiddenConverter" />
       <fw:BooleanToNotVisibilityConverter x:Key="NotVisibilityConverter" />
+      <fw:BooleanToIntConverter x:Key="BooleanToIntConverter" />
       <fw:EnumToDisplayNameConverter x:Key="EnumToDisplayNameConverter" />
       <fw:EnumBooleanConverter x:Key="EnumBooleanConverter" />
       <fw:CompanyNameOmitConverter x:Key="CompanyNameOmitConverter" />

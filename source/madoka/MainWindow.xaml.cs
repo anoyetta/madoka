@@ -2,9 +2,12 @@ using System;
 using System.ComponentModel;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Threading;
 using Hardcodet.Wpf.TaskbarNotification;
 using madoka.Common;
+using madoka.Models;
 using madoka.ViewModels;
 using MahApps.Metro.Controls;
 
@@ -25,6 +28,9 @@ namespace madoka
 
             this.StateChanged += this.MainWindow_StateChanged;
             this.Closing += this.MainWindow_Closing;
+
+            this.ViewModel.EnqueueSnackMessageCallback = (message, neverDuplicate) =>
+                this.Snackbar.MessageQueue.Enqueue(message, neverDuplicate);
 
             this.Closed += (_, __) =>
             {
@@ -58,16 +64,18 @@ namespace madoka
             }
         }
 
+        public MainWindowViewModel ViewModel => this.DataContext as MainWindowViewModel;
+
         private void MainWindow_StateChanged(object sender, EventArgs e)
         {
             if (this.WindowState == WindowState.Minimized)
             {
-                this.Visibility = Visibility.Collapsed;
+                this.Hide();
                 this.NotifyIcon.Visibility = Visibility.Visible;
             }
             else
             {
-                this.Visibility = Visibility.Visible;
+                this.Show();
                 this.NotifyIcon.Visibility = Visibility.Collapsed;
             }
         }
@@ -87,34 +95,36 @@ namespace madoka
             this.NotifyIcon.Dispose();
         }
 
-        public void ToggleVisibility()
-        {
-            if (this.WindowState == WindowState.Minimized)
-            {
-                this.ToShow();
-            }
-            else
-            {
-                this.ToHide();
-            }
-        }
-
         public void ToShow()
         {
-            this.Visibility = Visibility.Visible;
-            this.WindowState = WindowState.Normal;
+            this.Show();
+            this.NotifyIcon.Visibility = Visibility.Collapsed;
         }
 
         public void ToHide()
         {
-            this.WindowState = WindowState.Minimized;
-            this.Visibility = Visibility.Collapsed;
+            this.Hide();
+            this.NotifyIcon.Visibility = Visibility.Visible;
         }
 
         public void ToEnd()
         {
             this.toEnd = true;
             this.Close();
+        }
+
+        private void ModelPanel_MouseLeftButtonDown(
+            object sender,
+            MouseButtonEventArgs e)
+        {
+            if (e.ClickCount == 2)
+            {
+                var model = (sender as Border).DataContext as ManagedWindowModel;
+                if (model != null)
+                {
+                    this.ViewModel.EditModelCommand.Execute(model);
+                }
+            }
         }
     }
 }

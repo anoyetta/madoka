@@ -19,9 +19,11 @@ namespace madoka
 
         public App()
         {
+            this.DispatcherUnhandledException += this.App_DispatcherUnhandledException;
             this.Startup += this.App_Startup;
             this.Exit += this.App_Exit;
-            this.DispatcherUnhandledException += this.App_DispatcherUnhandledException;
+
+            this.ShutdownMode = ShutdownMode.OnMainWindowClose;
         }
 
         private void App_Startup(object sender, StartupEventArgs e)
@@ -29,6 +31,19 @@ namespace madoka
             // Configをロードする
             var c = Config.Instance;
             c.SetStartup(c.IsStartupWithWindows);
+
+            if (!c.ManagedWindowList.Any())
+            {
+                var model = new ManagedWindowModel()
+                {
+                    Exe = @"C:\Windows\notepad.exe",
+                    IsSetLocation = true,
+                    X = 20,
+                    Y = 20,
+                };
+
+                c.ManagedWindowList.Add(model);
+            }
 
             // 監視スレッドを生成する
             this.detectProcessThread = new Thread(new ThreadStart(this.DetectProcessLoop))
@@ -66,9 +81,11 @@ namespace madoka
 
         private void DetectProcessLoop()
         {
+            Thread.Sleep(TimeSpan.FromSeconds(Config.Instance.ProcessScaningInterval));
+
             while (true)
             {
-                Thread.Sleep(TimeSpan.FromSeconds(2));
+                Thread.Sleep(TimeSpan.FromSeconds(Config.Instance.ProcessScaningInterval));
 
                 if (this.semaphore)
                 {
@@ -114,7 +131,8 @@ namespace madoka
                     }
 
                     var p = Process.GetProcessesByName(Path.GetFileNameWithoutExtension(target.Exe));
-                    if (p == null)
+                    if (p == null ||
+                        p.Length <= 0)
                     {
                         await this.Dispatcher.InvokeAsync(() =>
                         {
@@ -130,12 +148,7 @@ namespace madoka
                     });
 
                     await target.GetProcessDPIAwareness();
-
-                    if (target.IsLockLocation ||
-                        !target.IsLocationApplied)
-                    {
-                        await target.SetWindowRect();
-                    }
+                    await target.SetWindowRect(target.IsLockLocation);
                 }
                 finally
                 {

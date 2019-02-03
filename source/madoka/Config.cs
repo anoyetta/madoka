@@ -45,6 +45,15 @@ namespace madoka
         [JsonIgnore]
         public string AppVersionString => $"v{this.AppVersion.ToString()}";
 
+        private double processScaningInterval = 5.0;
+
+        [JsonProperty(PropertyName = "process_scaning_interval")]
+        public double ProcessScaningInterval
+        {
+            get => this.processScaningInterval;
+            set => this.SetProperty(ref this.processScaningInterval, Math.Round(value, 1));
+        }
+
         private double scale = 1.0;
 
         [JsonProperty(PropertyName = "scale")]

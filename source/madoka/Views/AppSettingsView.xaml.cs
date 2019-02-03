@@ -1,6 +1,7 @@
 using System.Windows.Input;
 using madoka.ViewModels;
 using MahApps.Metro.Controls;
+using MahApps.Metro.Controls.Dialogs;
 
 namespace madoka.Views
 {
@@ -29,6 +30,9 @@ namespace madoka.Views
                 if (vm != null)
                 {
                     vm.CloseAction = this.Close;
+                    vm.ShowMessageAsyncCallback = (a, b, c, d) => this.ShowMessageAsync(a, b, c, d);
+                    vm.EnqueueSnackMessageCallback = (message, neverDuplicate) =>
+                        this.Snackbar.MessageQueue.Enqueue(message, neverDuplicate);
                 }
             };
         }

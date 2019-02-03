@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using madoka.Common;
 using madoka.Models;
+using MahApps.Metro.Controls.Dialogs;
 using Prism.Commands;
 using Prism.Mvvm;
 
@@ -24,6 +25,10 @@ namespace madoka.ViewModels
 
         public Action CloseAction { get; set; }
 
+        public WPFHelper.ShowMessageAsyncDelegate ShowMessageAsyncCallback { get; set; }
+
+        public WPFHelper.EnqueueSnackMessageDelegate EnqueueSnackMessageCallback { get; set; }
+
         public IEnumerable<EnumContainer<DPIAwares>> DPIAwaresValues =>
             EnumConverter.ToEnumerableContainer<DPIAwares>()
             .Where(x => x.Value != DPIAwares.Unknown);
@@ -37,27 +42,38 @@ namespace madoka.ViewModels
                     {
                         await Task.WhenAll(
                             this.model.SetRegistry(),
-                            this.model.SetWindowRect());
+                            this.model.SetWindowRect(true));
 
                         lock (this.Config.ManagedWindowList)
                         {
-                            if (!this.Config.ManagedWindowList.Any(x =>
-                                string.Equals(x.Exe, this.model.Exe, StringComparison.OrdinalIgnoreCase)))
+                            if (!this.Config.ManagedWindowList.Any(x => x.ID == this.model.ID))
                             {
                                 this.Config.ManagedWindowList.Add(this.model);
                             }
                         }
+
+                        this.CloseAction?.Invoke();
                     }
                 }));
 
         private ICommand deleteCommand;
 
         public ICommand DeleteCommand =>
-            this.deleteCommand ?? (this.deleteCommand = new DelegateCommand(() =>
+            this.deleteCommand ?? (this.deleteCommand = new DelegateCommand(async () =>
             {
+                var result = await this.ShowMessageAsyncCallback?.Invoke(
+                    "確認",
+                    $"{this.model.DisplayName} の設定を削除しますか？",
+                    MessageDialogStyle.AffirmativeAndNegative);
+
+                if (result != MessageDialogResult.Affirmative)
+                {
+                    return;
+                }
+
                 lock (this.Config.ManagedWindowList)
                 {
-                    if (!this.Config.ManagedWindowList.Contains(this.model))
+                    if (this.Config.ManagedWindowList.Any(x => x.ID == this.model.ID))
                     {
                         this.Config.ManagedWindowList.Remove(this.model);
                         this.CloseAction?.Invoke();
@@ -68,7 +84,15 @@ namespace madoka.ViewModels
         private ICommand runCommand;
 
         public ICommand RunCommand =>
-            this.runCommand ?? (this.runCommand = new DelegateCommand(async () => await this.model.Run()));
+            this.runCommand ?? (this.runCommand = new DelegateCommand(async () =>
+            {
+                var r = await this.model.Run();
+                if (r)
+                {
+                    this.EnqueueSnackMessageCallback?.Invoke(
+                        $"{this.model.DisplayName} を起動しました。");
+                }
+            }));
 
         private ICommand getProcessInfoCommand;
 
@@ -81,11 +105,27 @@ namespace madoka.ViewModels
         private ICommand applyLayoutCommand;
 
         public ICommand ApplyLayoutCommand =>
-            this.applyLayoutCommand ?? (this.applyLayoutCommand = new DelegateCommand(async () => await this.model.SetWindowRect()));
+            this.applyLayoutCommand ?? (this.applyLayoutCommand = new DelegateCommand(async () =>
+            {
+                var r = await this.model.SetWindowRect(true);
+                if (r)
+                {
+                    this.EnqueueSnackMessageCallback?.Invoke(
+                        $"{this.model.DisplayName} にレイアウトを適用しました。");
+                }
+            }));
 
         private ICommand applyScalingCommand;
 
         public ICommand ApplyScalingCommand =>
-            this.applyScalingCommand ?? (this.applyScalingCommand = new DelegateCommand(async () => await this.model.SetRegistry()));
+            this.applyScalingCommand ?? (this.applyScalingCommand = new DelegateCommand(async () =>
+            {
+                var r = await this.model.SetRegistry();
+                if (r)
+                {
+                    this.EnqueueSnackMessageCallback?.Invoke(
+                        $"互換性及びDPIスケーリング設定をレジストリに登録しました。");
+                }
+            }));
     }
 }

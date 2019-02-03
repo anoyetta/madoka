@@ -64,15 +64,19 @@
         </Grid>
       </metro:MetroHeader>
 
-      <CheckBox
-        Content="Windows のスタート時に起動する"
-        IsChecked="{Binding Config.IsStartupWithWindows}"
-        Margin="{DynamicResource ContentMargin}" />
+      <metro:ToggleSwitch
+        Style="{StaticResource MahApps.Metro.Styles.ToggleSwitch.Win10}"
+        Margin="{DynamicResource ContentMargin}"
+        HorizontalAlignment="Left"
+        IsChecked="{Binding Model.IsStartupWithWindows, Mode=TwoWay}"
+        Content="Windows のスタート時に起動する" />
 
-      <CheckBox
-        Content="最小化状態で起動する"
-        IsChecked="{Binding Config.IsMinimizeStartup}"
-        Margin="{DynamicResource ContentMargin}" />
+      <metro:ToggleSwitch
+        Style="{StaticResource MahApps.Metro.Styles.ToggleSwitch.Win10}"
+        Margin="{DynamicResource ContentMargin}"
+        HorizontalAlignment="Left"
+        IsChecked="{Binding Model.IsMinimizeStartup, Mode=TwoWay}"
+        Content="最小化状態で起動する" />
     </StackPanel>
   </Grid>
 </metro:MetroWindow>

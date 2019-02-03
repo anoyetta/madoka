@@ -1,11 +1,23 @@
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
 using MahApps.Metro.Controls;
+using MahApps.Metro.Controls.Dialogs;
 
 namespace madoka.Common
 {
     public static class WPFHelper
     {
+        public delegate Task<MessageDialogResult> ShowMessageAsyncDelegate(
+            string title,
+            string message,
+            MessageDialogStyle style = MessageDialogStyle.Affirmative,
+            MetroDialogSettings settings = null);
+
+        public delegate void EnqueueSnackMessageDelegate(
+            string message,
+            bool neverDuplicate = true);
+
         public static MetroWindow MainWindow => Application.Current?.MainWindow as MetroWindow;
 
         public static Dispatcher Dispatcher => Application.Current?.Dispatcher;

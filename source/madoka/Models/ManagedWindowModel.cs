@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Windows;
@@ -11,7 +13,6 @@ using Microsoft.Win32;
 using Newtonsoft.Json;
 using Prism.Mvvm;
 using Reactive.Bindings;
-using Reactive.Bindings.Extensions;
 
 namespace madoka.Models
 {
@@ -49,11 +50,23 @@ namespace madoka.Models
     {
         public ManagedWindowModel()
         {
-            this.ObserveProperty(x => x.Name)
-                .Subscribe(x => this.SetDisplayName(x, this.exe));
+            this.PropertyChanged += (_, e) =>
+            {
+                switch (e.PropertyName)
+                {
+                    case nameof(this.Name):
+                    case nameof(this.Exe):
+                        this.SetDisplayName(this.name, this.exe);
+                        break;
 
-            this.ObserveProperty(x => x.Exe)
-                .Subscribe(x => this.SetDisplayName(this.name, x));
+                    case nameof(this.DPIAware):
+                    case nameof(this.IsMadokaScaling):
+                        this.ScalingMode = this.IsMadokaScaling ?
+                            "madoka scaling" :
+                            this.DPIAware.ToDisplayName();
+                        break;
+                }
+            };
         }
 
         private void SetDisplayName(
@@ -62,17 +75,39 @@ namespace madoka.Models
         {
             if (!string.IsNullOrEmpty(name))
             {
-                this.DisplayName.Value = name;
+                this.DisplayName = name;
                 return;
             }
 
             if (!string.IsNullOrEmpty(exe))
             {
                 var text = Path.GetFileNameWithoutExtension(exe);
-                this.DisplayName.Value = !string.IsNullOrEmpty(text) ? text : exe;
+                this.DisplayName = !string.IsNullOrEmpty(text) ? text : exe;
+                return;
             }
 
-            this.DisplayName.Value = string.Empty;
+            this.DisplayName = string.Empty;
+        }
+
+        [JsonIgnore]
+        public Guid ID { get; private set; } = Guid.NewGuid();
+
+        private string displayName;
+
+        [JsonIgnore]
+        public string DisplayName
+        {
+            get => this.displayName;
+            set => this.SetProperty(ref this.displayName, value);
+        }
+
+        private string scalingMode;
+
+        [JsonIgnore]
+        public string ScalingMode
+        {
+            get => this.scalingMode;
+            set => this.SetProperty(ref this.scalingMode, value);
         }
 
         private bool isEnabled = true;
@@ -92,9 +127,6 @@ namespace madoka.Models
             get => this.name;
             set => this.SetProperty(ref this.name, value);
         }
-
-        [JsonIgnore]
-        public ReactiveProperty<string> DisplayName = new ReactiveProperty<string>();
 
         private string exe;
 
@@ -166,6 +198,24 @@ namespace madoka.Models
         {
             get => this.dpiAware;
             set => this.SetProperty(ref this.dpiAware, value);
+        }
+
+        private bool isMadokaScaling = false;
+
+        [JsonProperty(PropertyName = "madoka_scaling")]
+        public bool IsMadokaScaling
+        {
+            get => this.isMadokaScaling;
+            set => this.SetProperty(ref this.isMadokaScaling, value);
+        }
+
+        private double madokaScale = 1.0d;
+
+        [JsonProperty(PropertyName = "madoka_scale")]
+        public double MadokaScale
+        {
+            get => this.madokaScale;
+            set => this.SetProperty(ref this.madokaScale, Math.Round(value));
         }
 
         private NativeMethods.PROCESS_DPI_AWARENESS processDPIAwareness = NativeMethods.PROCESS_DPI_AWARENESS.PROCESS_DPI_UNAWARE;
@@ -243,13 +293,17 @@ namespace madoka.Models
         [JsonIgnore]
         public ManagedWindowGroupModel Parrent { get; set; }
 
-        private int managedProcessID;
+        private ObservableCollection<int> managedProcessIDList = new ObservableCollection<int>();
 
         [JsonIgnore]
-        public int ManagedProcessID
+        public ObservableCollection<int> ManagedProcessIDList
         {
-            get => this.managedProcessID;
-            set => this.SetProperty(ref this.managedProcessID, value);
+            get => this.managedProcessIDList;
+            set
+            {
+                this.managedProcessIDList.Clear();
+                this.managedProcessIDList.AddRange(value);
+            }
         }
 
         [JsonIgnore]
@@ -257,17 +311,17 @@ namespace madoka.Models
 
         #region Methods
 
-        public async Task Run()
+        public async Task<bool> Run()
         {
             if (!this.isEnabled)
             {
-                return;
+                return false;
             }
 
             if (string.IsNullOrEmpty(this.exe) ||
                 !File.Exists(this.exe))
             {
-                return;
+                return false;
             }
 
             var directory = string.IsNullOrEmpty(this.workingDirectory) ?
@@ -285,13 +339,6 @@ namespace madoka.Models
                 };
 
                 var p = Process.Start(pi);
-
-                if (this.ManagedProcessID != p.Id)
-                {
-                    this.ManagedProcessID = p.Id;
-                    this.IsLocationApplied = false;
-                }
-
                 p.WaitForInputIdle();
 
                 await Application.Current.Dispatcher.InvokeAsync(() =>
@@ -302,6 +349,8 @@ namespace madoka.Models
                 await Task.Delay(TimeSpan.FromSeconds(0.1));
                 await this.SetWindowRect();
             });
+
+            return true;
         }
 
         private int lastDPIAwarenessDetectedProcessID = 0;
@@ -310,15 +359,17 @@ namespace madoka.Models
         {
             await Task.Run(async () =>
             {
-                if (this.managedProcessID == 0)
+                if (!this.ManagedProcessIDList.Any())
                 {
                     return;
                 }
 
-                if (this.lastDPIAwarenessDetectedProcessID != this.managedProcessID)
+                var id = this.ManagedProcessIDList.Last();
+
+                if (this.lastDPIAwarenessDetectedProcessID != id)
                 {
-                    this.lastDPIAwarenessDetectedProcessID = this.managedProcessID;
-                    var state = NativeMethods.GetDPIState((uint)this.managedProcessID);
+                    this.lastDPIAwarenessDetectedProcessID = id;
+                    var state = NativeMethods.GetDPIState((uint)id);
 
                     await Application.Current.Dispatcher.InvokeAsync(() =>
                     {
@@ -339,10 +390,10 @@ namespace madoka.Models
             var t1 = Task.Run(async () =>
             {
                 var key = $@"Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers";
-                var name = $"\"{this.exe}\"";
+                var name = $"{this.exe}";
                 var reg = Registry.CurrentUser.OpenSubKey(key, true);
 
-                var value = (string)reg?.GetValue(name);
+                var value = (string)reg?.GetValue(name) ?? string.Empty;
                 if (string.IsNullOrEmpty(value))
                 {
                     await Application.Current.Dispatcher.InvokeAsync(() =>
@@ -382,14 +433,19 @@ namespace madoka.Models
 
             var t2 = Task.Run(async () =>
             {
-                var handle = NativeMethods.FindWindow(Path.GetFileNameWithoutExtension(this.exe));
-                if (handle == IntPtr.Zero)
+                var handle =
+                    Process.GetProcessesByName(Path.GetFileNameWithoutExtension(this.exe))?
+                    .FirstOrDefault()?
+                    .MainWindowHandle;
+
+                if (!handle.HasValue ||
+                    handle.Value == IntPtr.Zero)
                 {
                     return;
                 }
 
                 var rect = new NativeMethods.RECT();
-                NativeMethods.GetWindowRect(handle, ref rect);
+                NativeMethods.GetWindowRect(handle.Value, ref rect);
 
                 await Application.Current.Dispatcher.InvokeAsync(() =>
                 {
@@ -403,21 +459,21 @@ namespace madoka.Models
             await Task.WhenAll(t1, t2);
         }
 
-        public async Task SetRegistry()
+        public async Task<bool> SetRegistry()
         {
             if (string.IsNullOrEmpty(this.exe) ||
                 !File.Exists(this.exe))
             {
-                return;
+                return false;
             }
 
-            await Task.Run(() =>
+            return await Task.Run(() =>
             {
                 var key = $@"Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers";
-                var name = $"\"{this.exe}\"";
+                var name = $"{this.exe}";
                 var reg = Registry.CurrentUser.OpenSubKey(key, true);
 
-                var value = (string)reg?.GetValue(name);
+                var value = (string)reg?.GetValue(name) ?? string.Empty;
 
                 if (!this.isRunAs &&
                     this.DPIAware == DPIAwares.Disable)
@@ -425,7 +481,7 @@ namespace madoka.Models
                     if (string.IsNullOrEmpty(value))
                     {
                         reg.DeleteValue(name, false);
-                        return;
+                        return true;
                     }
 
                     value = value.Replace("RUNASADMIN", string.Empty);
@@ -434,8 +490,16 @@ namespace madoka.Models
                     value = value.Replace("HIGHDPIAWARE", string.Empty);
                     value = value.Trim();
 
-                    reg.SetValue(name, value);
-                    return;
+                    if (!string.IsNullOrEmpty(value))
+                    {
+                        reg.SetValue(name, value);
+                    }
+                    else
+                    {
+                        reg.DeleteValue(name, false);
+                    }
+
+                    return true;
                 }
 
                 value = value.Replace("RUNASADMIN", string.Empty);
@@ -466,74 +530,109 @@ namespace madoka.Models
                 }
 
                 value = string.Join(" ", addValues);
-                reg.SetValue(name, value);
+                reg.SetValue(name, value.Trim());
+
+                return true;
             });
         }
 
-        public async Task SetWindowRect()
+        public async Task<bool> SetWindowRect(
+            bool isAlways = false)
         {
             if (!this.isEnabled)
             {
-                return;
+                return false;
             }
 
             if (string.IsNullOrEmpty(this.exe) ||
                 !File.Exists(this.exe))
             {
-                return;
+                return false;
             }
 
-            await Task.Run(() =>
+            return await Task.Run(() =>
             {
-                var handle = NativeMethods.FindWindow(Path.GetFileNameWithoutExtension(this.exe));
-                if (handle == IntPtr.Zero)
+                var processes = Process.GetProcessesByName(Path.GetFileNameWithoutExtension(this.exe));
+                if (processes == null ||
+                    !processes.Any())
                 {
-                    return;
+                    this.ManagedProcessIDList.Clear();
+                    return false;
                 }
 
-                var flag = (uint)(NativeMethods.SWPFlags.NOACTIVATE | NativeMethods.SWPFlags.NOZORDER);
-
-                if (!this.isSetLocation)
+                var applied = false;
+                foreach (var p in processes)
                 {
-                    flag |= (uint)NativeMethods.SWPFlags.NOREPOSITION;
+                    if (p.HasExited)
+                    {
+                        continue;
+                    }
+
+                    if (!isAlways)
+                    {
+                        if (this.ManagedProcessIDList.Contains(p.Id))
+                        {
+                            continue;
+                        }
+                    }
+
+                    var handle = p.MainWindowHandle;
+                    if (handle == IntPtr.Zero)
+                    {
+                        continue;
+                    }
+
+                    var flag = (uint)(NativeMethods.SWPFlags.NOACTIVATE | NativeMethods.SWPFlags.NOZORDER);
+
+                    if (!this.isSetLocation)
+                    {
+                        flag |= (uint)NativeMethods.SWPFlags.NOREPOSITION;
+                    }
+
+                    if (!this.isSetSize)
+                    {
+                        flag |= (uint)NativeMethods.SWPFlags.NOSIZE;
+                    }
+
+                    if (this.isSetLocation ||
+                        this.isSetSize)
+                    {
+                        NativeMethods.SetWindowPos(
+                            handle,
+                            IntPtr.Zero,
+                            this.x,
+                            this.y,
+                            this.w,
+                            this.h,
+                            flag);
+
+                        applied = true;
+                    }
+
+                    var cmd = 0;
+                    switch (this.windowState)
+                    {
+                        case WindowState.Minimized:
+                            cmd = (int)NativeMethods.ShowState.SW_MINIMIZE;
+                            break;
+
+                        case WindowState.Maximized:
+                            cmd = (int)NativeMethods.ShowState.SW_MAXIMIZE;
+                            break;
+                    }
+
+                    if (cmd != 0)
+                    {
+                        NativeMethods.ShowWindowAsync(handle, cmd);
+                    }
+
+                    if (!this.ManagedProcessIDList.Contains(p.Id))
+                    {
+                        this.ManagedProcessIDList.Add(p.Id);
+                    }
                 }
 
-                if (!this.isSetSize)
-                {
-                    flag |= (uint)NativeMethods.SWPFlags.NOSIZE;
-                }
-
-                if (this.isSetLocation ||
-                    this.isSetSize)
-                {
-                    NativeMethods.SetWindowPos(
-                        handle,
-                        IntPtr.Zero,
-                        this.x,
-                        this.y,
-                        this.w,
-                        this.h,
-                        flag);
-                }
-
-                var cmd = 0;
-                switch (this.windowState)
-                {
-                    case WindowState.Minimized:
-                        cmd = (int)NativeMethods.ShowState.SW_MINIMIZE;
-                        break;
-
-                    case WindowState.Maximized:
-                        cmd = (int)NativeMethods.ShowState.SW_MAXIMIZE;
-                        break;
-                }
-
-                if (cmd != 0)
-                {
-                    NativeMethods.ShowWindowAsync(handle, cmd);
-                }
-
-                this.IsLocationApplied = true;
+                return applied;
             });
         }
 
