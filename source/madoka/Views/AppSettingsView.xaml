@@ -171,7 +171,8 @@
                 </StackPanel>
               </metro:MetroHeader>
 
-              <metro:MetroHeader Header="madoka スケーリング" Margin="{DynamicResource ContentMargin}">
+              <!-- 未実装なので封印しておく -->
+              <metro:MetroHeader Header="madoka スケーリング (未対応)" Margin="{DynamicResource ContentMargin}" IsEnabled="False">
                 <StackPanel Margin="0 10 0 0">
                   <metro:ToggleSwitch
                     Style="{StaticResource MahApps.Metro.Styles.ToggleSwitch.Win10}"
@@ -199,12 +200,12 @@
                       TextAlignment="Right"
                       Text="{Binding ElementName=MadokaScaleSlider, Path=Value, Mode=OneWay, StringFormat=N2}" />
                   </Grid>
-
-                  <TextBlock Margin="0 20 0 0" HorizontalAlignment="Right">
-                  <Hyperlink Command="{Binding ApplyScalingCommand, Mode=OneWay}">Apply</Hyperlink>
-                  </TextBlock>
                 </StackPanel>
               </metro:MetroHeader>
+
+              <TextBlock Margin="0 20 0 0" HorizontalAlignment="Right">
+                <Hyperlink Command="{Binding ApplyScalingCommand, Mode=OneWay}">Apply</Hyperlink>
+              </TextBlock>
             </StackPanel>
           </GroupBox>
         </StackPanel>

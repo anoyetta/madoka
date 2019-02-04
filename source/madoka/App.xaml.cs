@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading;
 using System.Windows;
 using System.Windows.Threading;
+using madoka.Common;
 using madoka.Models;
 
 namespace madoka
@@ -19,6 +20,8 @@ namespace madoka
 
         public App()
         {
+            AppLogger.Init("madokaLog");
+
             this.DispatcherUnhandledException += this.App_DispatcherUnhandledException;
             this.Startup += this.App_Startup;
             this.Exit += this.App_Exit;
@@ -53,28 +56,57 @@ namespace madoka
             };
 
             this.detectProcessThread.Start();
+
+            AppLogger.Write($"{c.AppNameWithVersion} Start.");
         }
 
         private void App_Exit(object sender, ExitEventArgs e)
         {
-            Config.Instance.Save();
+            try
+            {
+                Config.Instance.Save();
+            }
+            finally
+            {
+                AppLogger.Write("madoka End.");
+                AppLogger.Flush();
+            }
         }
 
         private void App_DispatcherUnhandledException(
             object sender,
             DispatcherUnhandledExceptionEventArgs e)
         {
-            Config.Instance.Save();
+            try
+            {
+                Config.Instance.Save();
 
-            var message = string.Empty;
-            message += "予期しない例外が発生しました。アプリケーションを終了します。\n\n";
-            message += e.Exception.ToString();
+                if (this.MainWindow != null)
+                {
+                    MessageBoxHelper.ShowDialogMessageWindow(
+                        "madoka - Fatal",
+                        "予期しない例外を検知しました。アプリケーションを終了します。",
+                        e.Exception);
+                }
+                else
+                {
+                    MessageBox.Show(
+                        "予期しない例外を検知しました。アプリケーションを終了します。\n\n" +
+                        e.Exception,
+                        "madoka - Fatal",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Error);
+                }
+            }
+            finally
+            {
+                AppLogger.Fatal(
+                    "Unhandled Exception. 予期しない例外が発生しました。",
+                    e.Exception);
 
-            MessageBox.Show(
-                message,
-                "madoka - Faital",
-                MessageBoxButton.OK,
-                MessageBoxImage.Error);
+                AppLogger.Write("madoka Abort.");
+                AppLogger.Flush();
+            }
         }
 
         private volatile bool semaphore = false;
@@ -100,6 +132,15 @@ namespace madoka
                 catch (ThreadAbortException)
                 {
                     return;
+                }
+                catch (Exception ex)
+                {
+                    AppLogger.Error(
+                        "プロセススキャンスレッドで予期しない例外を検知しました。",
+                        ex);
+                    AppLogger.Flush();
+
+                    Thread.Sleep(TimeSpan.FromSeconds(10));
                 }
                 finally
                 {

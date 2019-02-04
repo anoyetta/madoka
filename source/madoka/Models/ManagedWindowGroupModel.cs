@@ -33,10 +33,32 @@ namespace madoka.Models
             {
                 this.children.Clear();
 
+                var isEnabledAll = false;
                 foreach (var item in value)
                 {
+                    isEnabledAll |= item.IsEnabled;
                     item.Parrent = this;
                     this.children.Add(item);
+                }
+
+                this.isEnabledAll = isEnabledAll;
+                this.RaisePropertyChanged(nameof(this.IsEnabledAll));
+            }
+        }
+
+        private bool isEnabledAll = false;
+
+        public bool IsEnabledAll
+        {
+            get => this.isEnabledAll;
+            set
+            {
+                if (this.SetProperty(ref this.isEnabledAll, value))
+                {
+                    foreach (var item in this.children)
+                    {
+                        item.IsEnabled = value;
+                    }
                 }
             }
         }
