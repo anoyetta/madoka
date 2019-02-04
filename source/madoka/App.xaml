@@ -24,6 +24,7 @@
         x:Key="IconButtonStyle"
         BasedOn="{StaticResource MahApps.Metro.Styles.MetroCircleButtonStyle}"
         TargetType="{x:Type ButtonBase}">
+        <Setter Property="Focusable" Value="False" />
         <Setter Property="Background" Value="{DynamicResource HighlightBrush}" />
         <Setter Property="BorderThickness" Value="0" />
         <Style.Triggers>
