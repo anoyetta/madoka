@@ -53,6 +53,21 @@ namespace madoka.Common
             return metro.ShowMetroDialogAsync(dialog);
         }
 
+        public static void ShowDialogMessageWindow(
+            Window owner,
+            string title,
+            string message,
+            Exception exception = null,
+            string windowTitle = null)
+            => MessageWindow.Show(owner, title, message, exception, windowTitle, true);
+
+        public static void ShowDialogMessageWindow(
+            string title,
+            string message,
+            Exception exception = null,
+            string windowTitle = null)
+            => MessageWindow.Show(null, title, message, exception, windowTitle, true);
+
         public static void ShowMessageWindow(
             string title,
             string message,

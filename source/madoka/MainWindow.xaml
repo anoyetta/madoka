@@ -113,15 +113,28 @@
                 FontSize="{DynamicResource NormalFontSize}"
                 Visibility="{Binding IsExistsGroupName, Mode=OneWay, Converter={StaticResource VisibilityConverter}}" />
 
+              <metro:ToggleSwitch
+                Margin="5 0 0 0"
+                HorizontalAlignment="Right"
+                DockPanel.Dock="Right"
+                VerticalAlignment="Center"
+                Visibility="{Binding IsExistsGroupName, Mode=OneWay, Converter={StaticResource VisibilityConverter}}"
+                Style="{StaticResource MahApps.Metro.Styles.ToggleSwitch.Win10}"
+                IsChecked="{Binding IsEnabledAll, Mode=TwoWay}"
+                Content=""
+                ToolTip="グループの設定ON/OFFを一斉に切り替える" />
+
               <Button
                 Width="35" Height="35"
                 HorizontalAlignment="Right"
+                DockPanel.Dock="Right"
                 VerticalAlignment="Center"
                 Visibility="{Binding IsExistsGroupName, Mode=OneWay, Converter={StaticResource VisibilityConverter}}"
                 Style="{DynamicResource IconButtonStyle}"
                 Background="{DynamicResource WhiteBrush}"
                 Command="{Binding ElementName=BaseWindow, Path=DataContext.RunGroupAppsCommand, Mode=OneWay}"
-                CommandParameter="{Binding}">
+                CommandParameter="{Binding}"
+                ToolTip="グループの有効なアプリケーションを一斉に起動する">
                 <Viewbox>
                   <iconPacks:PackIconMaterial Kind="Power" Padding="3" Foreground="{DynamicResource HighlightBrush}" />
                 </Viewbox>
@@ -155,7 +168,7 @@
                     Padding="15 10"
                     Margin="0 0 15 15"
                     CornerRadius="6"
-                    Width="300"
+                    Width="320"
                     Height="130"
                     TextElement.Foreground="{DynamicResource WhiteBrush}"
                     MouseLeftButtonDown="ModelPanel_MouseLeftButtonDown">
@@ -268,12 +281,25 @@
                       </DockPanel>
 
                       <!-- 表示名 -->
-                      <TextBlock
-                        Grid.Column="0"
-                        Grid.Row="0"
-                        Text="{Binding DisplayName, Mode=OneWay}"
-                        FontSize="{DynamicResource FlyoutHeaderFontSize}"
-                        TextTrimming="CharacterEllipsis" />
+                      <Grid Grid.Column="0" Grid.Row="0">
+                        <Grid.ColumnDefinitions>
+                          <ColumnDefinition Width="Auto" />
+                          <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock
+                          Grid.Column="1"
+                          Text="{Binding DisplayName, Mode=OneWay}"
+                          FontSize="{DynamicResource FlyoutHeaderFontSize}"
+                          TextTrimming="CharacterEllipsis" />
+
+                        <Viewbox
+                          Grid.Column="0"
+                          Margin="0 0 7 0"
+                          Visibility="{Binding IsExistsAppIcon, Mode=OneWay, Converter={StaticResource VisibilityConverter}}">
+                          <Image Source="{Binding AppIcon, Mode=OneWay}" />
+                        </Viewbox>
+                      </Grid>
                     </Grid>
                   </Border>
                 </DataTemplate>

@@ -17,6 +17,13 @@ namespace madoka.Common.Views
             this.InitializeComponent();
         }
 
+        internal static void ShowDialog(
+            string title,
+            string message,
+            Exception exception = null,
+            string windowTitle = null)
+            => Show(null, title, message, exception, windowTitle, true);
+
         internal static void Show(
             string title,
             string message,
@@ -29,7 +36,8 @@ namespace madoka.Common.Views
             string title,
             string message,
             Exception exception = null,
-            string windowTitle = null)
+            string windowTitle = null,
+            bool isModal = false)
         {
             if (string.IsNullOrEmpty(windowTitle))
             {
@@ -51,7 +59,15 @@ namespace madoka.Common.Views
             window.MessageContent.Exception = exception;
 
             SystemSounds.Asterisk.Play();
-            window.Show();
+
+            if (!isModal)
+            {
+                window.Show();
+            }
+            else
+            {
+                window.ShowDialog();
+            }
         }
     }
 }

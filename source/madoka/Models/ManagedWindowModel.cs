@@ -8,6 +8,7 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Media;
 using madoka.Common;
 using Microsoft.Win32;
 using Newtonsoft.Json;
@@ -54,9 +55,15 @@ namespace madoka.Models
             {
                 switch (e.PropertyName)
                 {
-                    case nameof(this.Name):
                     case nameof(this.Exe):
+                    case nameof(this.Name):
                         this.SetDisplayName(this.name, this.exe);
+                        if (e.PropertyName == nameof(this.Exe))
+                        {
+                            this.RaisePropertyChanged(nameof(this.AppIcon));
+                            this.RaisePropertyChanged(nameof(this.IsExistsAppIcon));
+                        }
+
                         break;
 
                     case nameof(this.DPIAware):
@@ -67,6 +74,8 @@ namespace madoka.Models
                         break;
                 }
             };
+
+            this.managedProcessIDList.CollectionChanged += (_, __) => this.RaisePropertyChanged(nameof(this.ManagedProcessIDs));
         }
 
         private void SetDisplayName(
@@ -100,6 +109,12 @@ namespace madoka.Models
             get => this.displayName;
             set => this.SetProperty(ref this.displayName, value);
         }
+
+        [JsonIgnore]
+        public ImageSource AppIcon => NativeMethods.GetAppIcon(this.exe);
+
+        [JsonIgnore]
+        public bool IsExistsAppIcon => this.AppIcon != null;
 
         private string scalingMode;
 
@@ -215,7 +230,7 @@ namespace madoka.Models
         public double MadokaScale
         {
             get => this.madokaScale;
-            set => this.SetProperty(ref this.madokaScale, Math.Round(value));
+            set => this.SetProperty(ref this.madokaScale, Math.Round(value, 2));
         }
 
         private NativeMethods.PROCESS_DPI_AWARENESS processDPIAwareness = NativeMethods.PROCESS_DPI_AWARENESS.PROCESS_DPI_UNAWARE;
@@ -307,7 +322,7 @@ namespace madoka.Models
         }
 
         [JsonIgnore]
-        public bool IsLocationApplied { get; private set; }
+        public string ManagedProcessIDs => string.Join(", ", this.ManagedProcessIDList);
 
         #region Methods
 
@@ -339,7 +354,16 @@ namespace madoka.Models
                 };
 
                 var p = Process.Start(pi);
-                p.WaitForInputIdle();
+                await Task.Delay(10);
+
+                try
+                {
+                    p.WaitForInputIdle();
+                }
+                catch (InvalidOperationException)
+                {
+                    await Task.Delay(200);
+                }
 
                 await Application.Current.Dispatcher.InvokeAsync(() =>
                 {
