@@ -252,7 +252,7 @@
                           </Viewbox>
                         </Button>
 
-                        <!-- Lauout button -->
+                        <!-- Layout button -->
                         <Button
                           Width="35" Height="35"
                           DockPanel.Dock="Top"

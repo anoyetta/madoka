@@ -55,6 +55,10 @@
                 <TextBox Text="{Binding Model.Exe, Mode=TwoWay}" />
               </metro:MetroHeader>
 
+              <metro:MetroHeader Header="管理対象とするプロセス名 (Optional)" Margin="{DynamicResource ContentMargin}" ToolTip="起動用プロセスと実行プロセスが異なる場合に管理対象とするプロセス名を指定します">
+                <TextBox Text="{Binding Model.ManagedProcessName, Mode=TwoWay}" />
+              </metro:MetroHeader>
+
               <metro:MetroHeader Header="作業ディレクトリ (Optional)" Margin="{DynamicResource ContentMargin}">
                 <TextBox Text="{Binding Model.WorkingDirectory, Mode=TwoWay}" />
               </metro:MetroHeader>

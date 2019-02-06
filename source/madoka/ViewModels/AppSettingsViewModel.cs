@@ -23,6 +23,8 @@ namespace madoka.ViewModels
             set => this.SetProperty(ref this.model, value);
         }
 
+        public Action RefreshManagedWindowsListCallback { get; set; }
+
         public Action CloseAction { get; set; }
 
         public WPFHelper.ShowMessageAsyncDelegate ShowMessageAsyncCallback { get; set; }
@@ -53,6 +55,7 @@ namespace madoka.ViewModels
                         }
 
                         this.CloseAction?.Invoke();
+                        this.RefreshManagedWindowsListCallback?.Invoke();
                     }
                 }));
 

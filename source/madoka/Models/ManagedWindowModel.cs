@@ -127,7 +127,7 @@ namespace madoka.Models
 
         private bool isEnabled = true;
 
-        [JsonProperty(PropertyName = "enabled")]
+        [JsonProperty(PropertyName = "enabled", DefaultValueHandling = DefaultValueHandling.Include)]
         public bool IsEnabled
         {
             get => this.isEnabled;
@@ -150,6 +150,48 @@ namespace madoka.Models
         {
             get => this.exe;
             set => this.SetProperty(ref this.exe, value.Replace("\"", string.Empty));
+        }
+
+        private string managedProcessName;
+
+        [JsonProperty(PropertyName = "process_name")]
+        public string ManagedProcessName
+        {
+            get => this.managedProcessName;
+            set
+            {
+                if (string.IsNullOrEmpty(value))
+                {
+                    this.SetProperty(ref this.managedProcessName, value);
+                    return;
+                }
+
+                var path = value.Replace("\"", string.Empty);
+                if (File.Exists(path))
+                {
+                    this.SetProperty(ref this.managedProcessName, Path.GetFileNameWithoutExtension(path));
+                }
+                else
+                {
+                    this.SetProperty(ref this.managedProcessName, path);
+                }
+            }
+        }
+
+        public string GetProcessName()
+        {
+            if (!string.IsNullOrEmpty(this.managedProcessName))
+            {
+                return this.managedProcessName;
+            }
+
+            if (string.IsNullOrEmpty(this.exe) ||
+                !File.Exists(this.exe))
+            {
+                return string.Empty;
+            }
+
+            return Path.GetFileNameWithoutExtension(this.exe);
         }
 
         private bool isRunning;
@@ -458,7 +500,7 @@ namespace madoka.Models
             var t2 = Task.Run(async () =>
             {
                 var handle =
-                    Process.GetProcessesByName(Path.GetFileNameWithoutExtension(this.exe))?
+                    Process.GetProcessesByName(this.GetProcessName())?
                     .FirstOrDefault()?
                     .MainWindowHandle;
 
@@ -576,7 +618,7 @@ namespace madoka.Models
 
             return await Task.Run(() =>
             {
-                var processes = Process.GetProcessesByName(Path.GetFileNameWithoutExtension(this.exe));
+                var processes = Process.GetProcessesByName(this.GetProcessName());
                 if (processes == null ||
                     !processes.Any())
                 {

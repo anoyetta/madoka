@@ -42,7 +42,6 @@ namespace madoka.Models
                 }
 
                 this.isEnabledAll = isEnabledAll;
-                this.RaisePropertyChanged(nameof(this.IsEnabledAll));
             }
         }
 
