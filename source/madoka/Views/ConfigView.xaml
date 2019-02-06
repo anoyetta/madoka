@@ -24,7 +24,8 @@
   ResizeMode="NoResize"
   WindowStartupLocation="CenterOwner"
   TitleCharacterCasing="Normal"
-  Title="madoka - Config" Height="450" Width="800">
+  Title="madoka - Config"
+  Height="450" Width="800">
 
   <metro:MetroWindow.LayoutTransform>
     <ScaleTransform ScaleX="{Binding Config.Scale, Mode=OneWay}" ScaleY="{Binding Config.Scale, Mode=OneWay}" />
