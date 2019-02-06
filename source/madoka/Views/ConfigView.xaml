@@ -69,14 +69,14 @@
         Style="{StaticResource MahApps.Metro.Styles.ToggleSwitch.Win10}"
         Margin="{DynamicResource ContentMargin}"
         HorizontalAlignment="Left"
-        IsChecked="{Binding Model.IsStartupWithWindows, Mode=TwoWay}"
+        IsChecked="{Binding Config.IsStartupWithWindows, Mode=TwoWay}"
         Content="Windows のスタート時に起動する" />
 
       <metro:ToggleSwitch
         Style="{StaticResource MahApps.Metro.Styles.ToggleSwitch.Win10}"
         Margin="{DynamicResource ContentMargin}"
         HorizontalAlignment="Left"
-        IsChecked="{Binding Model.IsMinimizeStartup, Mode=TwoWay}"
+        IsChecked="{Binding Config.IsMinimizeStartup, Mode=TwoWay}"
         Content="最小化状態で起動する" />
     </StackPanel>
   </Grid>

@@ -153,6 +153,7 @@ namespace madoka.ViewModels
             };
 
             (view.DataContext as AppSettingsViewModel).Model = new ManagedWindowModel();
+            (view.DataContext as AppSettingsViewModel).RefreshManagedWindowsListCallback = () => this.RefreshList();
 
             view.Show();
         }
@@ -188,6 +189,7 @@ namespace madoka.ViewModels
                 };
 
                 (view.DataContext as AppSettingsViewModel).Model = model;
+                (view.DataContext as AppSettingsViewModel).RefreshManagedWindowsListCallback = () => this.RefreshList();
 
                 view.Show();
             }));

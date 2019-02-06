@@ -44,13 +44,14 @@ namespace madoka
             if (Config.Instance.IsMinimizeStartup)
             {
                 this.ShowInTaskbar = false;
+                this.WindowState = WindowState.Minimized;
 
                 this.Loaded += async (_, __) =>
                 {
                     this.ToHide();
+                    this.ShowInTaskbar = true;
 
                     await Task.Delay(TimeSpan.FromSeconds(0.1));
-                    this.ShowInTaskbar = true;
 
                     await WPFHelper.Dispatcher.InvokeAsync(() =>
                     {
@@ -98,13 +99,14 @@ namespace madoka
         public void ToShow()
         {
             this.Show();
+            this.WindowState = WindowState.Normal;
             this.NotifyIcon.Visibility = Visibility.Collapsed;
         }
 
         public void ToHide()
         {
-            this.Hide();
             this.NotifyIcon.Visibility = Visibility.Visible;
+            this.Hide();
         }
 
         public void ToEnd()
