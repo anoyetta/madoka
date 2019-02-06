@@ -173,6 +173,8 @@ namespace madoka.Models
                 }
                 else
                 {
+                    path = path.Replace(".exe", string.Empty);
+                    path = path.Replace(".EXE", string.Empty);
                     this.SetProperty(ref this.managedProcessName, path);
                 }
             }
