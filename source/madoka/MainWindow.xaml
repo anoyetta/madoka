@@ -28,8 +28,7 @@
   d:DataContext="{d:DesignInstance {x:Type vm:MainWindowViewModel}, IsDesignTimeCreatable=True}"
   Top="{Binding Config.MainWindowY, Mode=TwoWay}"
   Left="{Binding Config.MainWindowX, Mode=TwoWay}"
-  Width="{Binding Config.MainWindowW, Mode=TwoWay}"
-  Height="{Binding Config.MainWindowH, Mode=TwoWay}">
+  SizeToContent="WidthAndHeight">
 
   <metro:MetroWindow.DataContext>
     <vm:MainWindowViewModel />
@@ -75,7 +74,9 @@
     </Style>
   </metro:MetroWindow.Resources>
 
-  <Grid>
+  <Grid
+    Width="{Binding Config.MainWindowW, Mode=TwoWay}"
+    Height="{Binding Config.MainWindowH, Mode=TwoWay}">
 
     <tb:TaskbarIcon
       x:Name="NotifyIcon"
