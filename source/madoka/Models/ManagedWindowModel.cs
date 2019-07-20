@@ -433,6 +433,11 @@ namespace madoka.Models
                 }
 
                 var id = this.ManagedProcessIDList.Last();
+                var p = Process.GetProcessById(id);
+                if (p == null)
+                {
+                    return;
+                }
 
                 if (this.lastDPIAwarenessDetectedProcessID != id)
                 {
