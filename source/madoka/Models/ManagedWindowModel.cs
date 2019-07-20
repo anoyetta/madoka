@@ -627,7 +627,7 @@ namespace madoka.Models
             {
                 var processes = Process.GetProcessesByName(this.GetProcessName());
                 if (processes == null ||
-                    !processes.Any())
+                    !processes.Any(x => !x.HasExited))
                 {
                     this.ManagedProcessIDList.Clear();
                     return false;

@@ -173,14 +173,21 @@ namespace madoka
 
                     var p = Process.GetProcessesByName(Path.GetFileNameWithoutExtension(target.Exe));
                     if (p == null ||
-                        p.Length <= 0)
+                        !p.Any(x => !x.HasExited))
                     {
+                        target.ManagedProcessIDList.Clear();
+
                         await this.Dispatcher.InvokeAsync(() =>
                         {
                             target.IsRunning = false;
                         });
 
                         continue;
+                    }
+
+                    foreach (var exitedPID in p.Where(x => x.HasExited).Select(x => x.Id))
+                    {
+                        target.ManagedProcessIDList.Remove(exitedPID);
                     }
 
                     await this.Dispatcher.InvokeAsync(() =>
