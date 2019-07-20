@@ -44,7 +44,7 @@ namespace madoka.Common
             string defaultLoggerName,
             string configFileName = null)
         {
-            LoadConfiguration(configFileName, Assembly.GetCallingAssembly());
+            LoadConfiguration(configFileName, Assembly.GetEntryAssembly());
             defaultLogger = LogManager.GetLogger(defaultLoggerName);
 
             Write($"{defaultLogger.Name} Init.");

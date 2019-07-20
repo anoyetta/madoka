@@ -20,13 +20,13 @@ namespace madoka
 
         public App()
         {
-            AppLogger.Init("madokaLog");
-
             this.DispatcherUnhandledException += this.App_DispatcherUnhandledException;
             this.Startup += this.App_Startup;
             this.Exit += this.App_Exit;
 
             this.ShutdownMode = ShutdownMode.OnMainWindowClose;
+
+            AppLogger.Init("madokaLog");
         }
 
         private void App_Startup(object sender, StartupEventArgs e)
