@@ -65,6 +65,7 @@ namespace madoka
             try
             {
                 Config.Instance.Save();
+                Thread.Sleep(50);
             }
             finally
             {
@@ -80,6 +81,7 @@ namespace madoka
             try
             {
                 Config.Instance.Save();
+                Thread.Sleep(50);
 
                 if (this.MainWindow != null)
                 {

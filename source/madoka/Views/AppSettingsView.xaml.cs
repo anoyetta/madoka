@@ -1,3 +1,4 @@
+using System.Threading;
 using System.Windows.Input;
 using madoka.ViewModels;
 using MahApps.Metro.Controls;
@@ -22,7 +23,11 @@ namespace madoka.Views
                 }
             };
 
-            this.Closed += (_, __) => Config.Instance.Save();
+            this.Closed += (_, __) =>
+            {
+                Config.Instance.Save();
+                Thread.Sleep(50);
+            };
 
             this.Loaded += (_, __) =>
             {

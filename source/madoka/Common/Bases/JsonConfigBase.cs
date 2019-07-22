@@ -264,10 +264,11 @@ namespace madoka.Common
                     Directory.CreateDirectory(dir);
                 }
 
-                File.WriteAllText(
-                    fileName,
-                    json + Environment.NewLine,
-                    new UTF8Encoding(false));
+                using (var sw = new StreamWriter(fileName, false, new UTF8Encoding(false)))
+                {
+                    sw.Write(json + Environment.NewLine);
+                    sw.Flush();
+                }
             }
         }
     }
